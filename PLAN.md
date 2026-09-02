@@ -541,11 +541,11 @@ Never print or commit secret values. `ANTHROPIC_API_KEY` is Phase 3 only.
 ## 13. Phases
 
 ### Phase 0 — Scaffold & deploy (half a day)
-- [ ] `npm create astro@latest` (minimal, TS strict); add `@astrojs/sitemap`,
+- [x] `npm create astro@latest` (minimal, TS strict); add `@astrojs/sitemap`,
       `@fontsource-variable/lora`; commit lockfile.
-- [ ] `tokens.css`, `base.css`, `prose.css`; `Base.astro` layout (header/footer/skip-link).
-- [ ] Placeholder home: headline + khẩu quyết footer, pure HTML/CSS on paper.
-- [ ] `deploy.yml`; repo variables set; **site live** at `https://<user>.github.io/ethano-site`.
+- [x] `tokens.css`, `base.css`, `prose.css`; `Base.astro` layout (header/footer/skip-link).
+- [x] Placeholder home: headline + khẩu quyết footer, pure HTML/CSS on paper.
+- [x] `deploy.yml`; repo variables set; **site live** at `https://ethanopraxis.github.io/ethanopraxis/`.
 - **Done when:** live URL renders the paper page; Lighthouse ≥ 95; build is clean.
 - **STOP. Show the owner the URL.**
 
