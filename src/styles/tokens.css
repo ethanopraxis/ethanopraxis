@@ -1,0 +1,26 @@
+:root {
+  /* paper + ink */
+  --paper:        #F2EADA;  /* aged paper — page background */
+  --paper-warm:   #FBF6EA;  /* card / raised paper */
+  --paper-shadow: #E7DDC6;  /* blotches, subtle fills */
+  --ink:          #2A241C;  /* primary ink — text, strokes */
+  --ink-soft:     #5C5347;  /* secondary text */
+  --ink-faint:    #8A7F6C;  /* muted text, captions */
+  --line:         #C9BEA6;  /* hairline rules, borders */
+  --vermilion:    #B13125;  /* seals, verdicts, accents — use sparingly */
+  --vermilion-ink:#8E2318;  /* vermilion text on paper (darker for contrast) */
+
+  /* type */
+  --font-serif: 'Lora Variable', Lora, Georgia, 'Times New Roman', serif;
+  --step--1: clamp(0.83rem, 0.80rem + 0.15vw, 0.94rem);
+  --step-0:  clamp(1.00rem, 0.95rem + 0.25vw, 1.13rem);
+  --step-1:  clamp(1.25rem, 1.15rem + 0.50vw, 1.50rem);
+  --step-2:  clamp(1.56rem, 1.35rem + 1.00vw, 2.25rem);
+  --step-3:  clamp(1.95rem, 1.55rem + 2.00vw, 3.40rem);
+
+  /* rhythm */
+  --space-1: 0.5rem; --space-2: 1rem; --space-3: 1.5rem;
+  --space-4: 2.5rem; --space-5: 4rem;
+  --radius-seal: 4px;
+  --measure: 68ch;
+}

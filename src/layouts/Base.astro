@@ -1,0 +1,88 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/prose.css';
+import loraVi from '../fonts/lora-vietnamese-wght-normal.woff2?url';
+import loraLatin from '../fonts/lora-latin-wght-normal.woff2?url';
+import { href } from '../lib/url';
+import { khauQuyetOfTheDay } from '../lib/khauQuyet';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// Phase 0 ships one page. The rest of the nav is written but inert until its
+// route exists — a dead link is worse than a visibly unopened door.
+const nav = [
+  { label: 'Binh pháp', path: '/binh-phap/', ready: false },
+  { label: 'Địa hình', path: '/dia-hinh/', ready: false },
+  { label: 'Thăm Thủy', path: '/tham-thuy/', ready: false },
+  { label: 'Series', path: '/series/', ready: false },
+  { label: 'Tìm', path: '/tim/', ready: false },
+];
+const here = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={href('/favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" href={href('/sitemap-index.xml')} />
+    <link rel="preload" href={loraVi} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={loraLatin} as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Ethano" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Sang phần nội dung</a>
+
+    <header class="masthead">
+      <div class="shell masthead__inner">
+        <a class="wordmark" href={href('/')}>
+          <span class="seal seal--lg" aria-hidden="true">E</span>
+          <span>Ethano</span>
+        </a>
+        <nav class="nav" aria-label="Chính">
+          {nav.map((it) =>
+            it.ready ? (
+              <a href={href(it.path)} aria-current={here === href(it.path) ? 'page' : undefined}>
+                {it.label}
+              </a>
+            ) : (
+              <span class="nav__soon">{it.label}</span>
+            )
+          )}
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="shell">
+      <slot />
+    </main>
+
+    <footer class="colophon">
+      <div class="shell colophon__inner">
+        <span class="seal seal--sm" aria-hidden="true">E</span>
+        <p class="khau-quyet">{khauQuyetOfTheDay()}</p>
+        <div class="colophon__links">
+          <a href="https://www.youtube.com/@EthanoPraxis" rel="me">YouTube</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

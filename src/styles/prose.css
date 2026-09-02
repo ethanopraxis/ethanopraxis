@@ -1,0 +1,20 @@
+.prose {
+  max-inline-size: var(--measure);
+}
+.prose > * + * { margin-block-start: var(--space-2); }
+.prose h2 { font-size: var(--step-1); margin-block-start: var(--space-4); }
+.prose h3 { font-size: var(--step-0); letter-spacing: 0.04em; text-transform: uppercase; }
+.prose strong { font-weight: 600; }
+.prose em { font-style: italic; }
+.prose hr {
+  border: 0;
+  border-block-start: 1px solid var(--line);
+  margin-block: var(--space-4);
+}
+.prose blockquote {
+  margin: var(--space-3) 0;
+  padding-inline-start: var(--space-2);
+  border-inline-start: 2px solid var(--line);
+  font-style: italic;
+  color: var(--ink-soft);
+}

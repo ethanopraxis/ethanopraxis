@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+
+const title = 'Ethano — Binh pháp cho những quyết định không có công thức';
+const description =
+  'Hai bộ binh pháp — Kiển–Khiêm và Nhu–Tỉnh — làm bản đồ điều hướng cho video, ' +
+  'loạt Thăm Thủy và các khoá học của kênh Ethano.';
+---
+
+<Base title={title} description={description}>
+  <section class="hero">
+    <h1 class="hero__title">
+      Binh pháp cho những quyết định<br />không có công thức
+      <!-- One signature visual: a single ink stroke, drawn once, no motion. -->
+      <svg class="hero__stroke" viewBox="0 0 600 18" preserveAspectRatio="none" aria-hidden="true">
+        <path
+          d="M4 12 C 96 4, 168 15, 262 8 S 430 3, 528 11 596 7 596 7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.4"
+          stroke-linecap="round"
+        />
+      </svg>
+    </h1>
+
+    <!-- TODO(owner): verify wording of this standfirst (my copy, not doctrine text). -->
+    <p class="hero__lede prose">
+      Hai bộ binh pháp — <em>Binh Pháp Kiển–Khiêm</em> và <em>Binh Pháp Nhu–Tỉnh</em> —
+      là cách tổ chức của trang này. Mỗi nội dung được đặt trên hai trục:
+      <strong>phương pháp</strong> (điều nào của binh pháp) và
+      <strong>địa hình</strong> (áp dụng vào lĩnh vực nào).
+    </p>
+
+    <hr class="hero__rule" />
+
+    <p class="hero__status">
+      Trang đang được dựng. Bản đồ binh pháp, Thăm Thủy và tìm kiếm sẽ lên trong các
+      giai đoạn kế tiếp. Trong lúc chờ, mời xem
+      <a href="https://www.youtube.com/@EthanoPraxis">kênh YouTube</a>.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 8vw, 6rem) var(--space-4);
+  }
+  .hero__title {
+    position: relative;
+    font-size: var(--step-3);
+    max-inline-size: 20ch;
+    margin-block-end: var(--space-4);
+  }
+  .hero__stroke {
+    display: block;
+    inline-size: min(100%, 30ch);
+    block-size: 0.5em;
+    margin-block-start: 0.15em;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .hero__lede {
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+  }
+  .hero__rule {
+    border: 0;
+    border-block-start: 1px solid var(--line);
+    max-inline-size: var(--measure);
+    margin-block: var(--space-4);
+  }
+  .hero__status {
+    max-inline-size: var(--measure);
+    color: var(--ink-soft);
+  }
+</style>
