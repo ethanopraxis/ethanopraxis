@@ -134,7 +134,9 @@ a:hover { text-decoration-color: var(--ink-soft); }
 .nav a { text-decoration: none; border-block-end: 1px solid transparent; }
 .nav a[aria-current='page'],
 .nav a:hover { border-block-end-color: var(--ink); }
-.nav__soon { color: var(--ink-soft); opacity: 0.55; cursor: default; }
+/* Routes not built yet: dotted rule says "unopened", not faint ink.
+   Text under 18px never goes below --ink-soft (PLAN §11 contrast rule). */
+.nav__soon { color: var(--ink-soft); border-block-end: 1px dotted var(--line); cursor: default; }
 
 /* footer ---------------------------------------------------------------- */
 .colophon {
