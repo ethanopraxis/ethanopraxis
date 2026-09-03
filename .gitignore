@@ -3,3 +3,10 @@ node_modules/
 dist/
 .astro/
 .DS_Store
+
+# Personal content stays local until published deliberately.
+# draft:true hides content from the built SITE, not from the REPOSITORY —
+# and this repo is public. Đại Nguyện goal files never enter git until
+# the disclosure decision is made.
+src/content/goals/*.md
+!src/content/goals/_example.md
