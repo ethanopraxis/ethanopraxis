@@ -6,7 +6,7 @@ quyenTitle: "Phá Kế"
 order: 3
 number: 9
 title: "Premortem phải có cả cost of inaction"
-essence: "TODO(owner): verify wording"
+essence: "Một chiến lược an toàn tuyệt đối có thể là chiến lược thất bại nếu cơ hội có thời hạn."
 ---
 Đừng chỉ hỏi:
 

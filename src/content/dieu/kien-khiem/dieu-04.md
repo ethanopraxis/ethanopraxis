@@ -6,7 +6,7 @@ quyenTitle: "Cầu Nguyên"
 order: 1
 number: 4
 title: "Khi chưa hiểu cơ chế, đừng tối ưu biểu hiện"
-essence: "TODO(owner): verify wording"
+essence: "First principles là một công cụ, không phải một tôn giáo."
 ---
 Hãy hỏi:
 

@@ -6,7 +6,7 @@ quyenTitle: "Chứng Thực"
 order: 3
 number: 19
 title: "Không phải mọi thứ đều đo được"
-essence: "TODO(owner): verify wording"
+essence: "Đây là judgment, không phải fact."
 ---
 Khi không có metric tốt, dùng:
 

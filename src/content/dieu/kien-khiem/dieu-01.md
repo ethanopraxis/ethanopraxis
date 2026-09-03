@@ -6,7 +6,7 @@ quyenTitle: "Quan Thế"
 order: 1
 number: 1
 title: "Đừng giải pháp trước khi định bài toán"
-essence: "TODO(owner): verify wording"
+essence: "Nếu định sai bài toán, giải pháp càng tốt càng nguy hiểm."
 ---
 Khi gặp một vấn đề, bản năng thường là hỏi:
 

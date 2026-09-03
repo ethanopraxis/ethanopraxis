@@ -6,7 +6,7 @@ quyenTitle: "Học Chiến"
 order: 2
 number: 26
 title: "Đừng học vô hạn"
-essence: "TODO(owner): verify wording"
+essence: "Cần biết đủ để hành động tốt."
 ---
 Đặt stopping condition:
 

@@ -6,7 +6,7 @@ quyenTitle: "Quan Thế"
 order: 3
 number: 3
 title: "Vẽ thế trận trước khi hành động"
-essence: "TODO(owner): verify wording"
+essence: "Không phải mọi trở ngại đều có thể phá bằng nỗ lực."
 ---
 Liệt kê bốn thứ:
 

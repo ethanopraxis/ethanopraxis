@@ -6,7 +6,7 @@ quyenTitle: "Định Hạn"
 order: 2
 number: 12
 title: "Phân biệt constraint thật và constraint tưởng tượng"
-essence: "TODO(owner): verify wording"
+essence: "Không thể về mặt vật lý, kinh tế, tổ chức, pháp lý, hay chỉ là vì ta chưa biết cách?"
 ---
 Mỗi khi nói “Không thể.”, phải hỏi:
 

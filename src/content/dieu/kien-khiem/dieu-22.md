@@ -6,7 +6,7 @@ quyenTitle: "Dụng Nhân"
 order: 3
 number: 22
 title: "Khi thiếu người dạy, hãy xây nhiều feedback loop"
-essence: "TODO(owner): verify wording"
+essence: "Độc lập giữa các nguồn quan trọng hơn số lượng nguồn."
 ---
 Không có một expert không có nghĩa là không thể học. Có thể ghép:
 

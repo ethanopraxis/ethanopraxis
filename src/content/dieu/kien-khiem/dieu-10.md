@@ -6,7 +6,7 @@ quyenTitle: "Phá Kế"
 order: 4
 number: 10
 title: "Tìm assumption có sức phá lớn nhất"
-essence: "TODO(owner): verify wording"
+essence: "Có assumption nào nếu sai thì toàn bộ kế sụp không?"
 ---
 Không cần phản biện mọi thứ. Hỏi:
 

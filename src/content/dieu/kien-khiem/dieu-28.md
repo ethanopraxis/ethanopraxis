@@ -6,7 +6,7 @@ quyenTitle: "Hành Quân"
 order: 1
 number: 28
 title: "Không chờ certainty"
-essence: "TODO(owner): verify wording"
+essence: "Mục tiêu không phải 100% chắc chắn."
 ---
 Trong nhiều vấn đề, certainty không tồn tại. Mục tiêu không phải 100% chắc chắn. Mà là:
 

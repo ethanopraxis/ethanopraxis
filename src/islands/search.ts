@@ -4,6 +4,7 @@
  * the folded fields so a query typed without diacritics still matches.
  */
 import { foldVi } from '../lib/foldVi';
+import { queryTerms } from '../lib/searchQuery';
 
 interface Doc {
   id: string; url: string; type: string; title: string;
@@ -42,7 +43,7 @@ async function query(src: string, term: string, filters: Record<string, string>)
   const where: Record<string, string> = {};
   for (const [k, v] of Object.entries(filters)) if (v) where[k] = v;
   const res = await search(db as never, {
-    term: foldVi(term),
+    term: queryTerms(foldVi(term)),
     properties: ['head', 'body'],
     // A hit in the title/quyển line means far more than a passing mention.
     boost: { head: 6, body: 1 },

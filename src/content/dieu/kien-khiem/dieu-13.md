@@ -6,7 +6,7 @@ quyenTitle: "Định Hạn"
 order: 3
 number: 13
 title: "Mỗi constraint phải có giá"
-essence: "TODO(owner): verify wording"
+essence: "Không biến constraint thành một câu thần chú để biện minh."
 ---
 Nếu một constraint thực sự tồn tại, ghi rõ:
 

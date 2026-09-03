@@ -6,7 +6,7 @@ quyenTitle: "Khiêm"
 order: 2
 number: 32
 title: "Ghi trước điều gì sẽ khiến mình đổi ý"
-essence: "TODO(owner): verify wording"
+essence: "Nếu sau này X thực sự xảy ra mà vẫn cố bảo vệ kế: ta không còn Khiêm nữa."
 ---
 Trước khi hành động, viết:
 

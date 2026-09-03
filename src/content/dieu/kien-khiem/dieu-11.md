@@ -6,7 +6,7 @@ quyenTitle: "Định Hạn"
 order: 1
 number: 11
 title: "Mọi kết luận phải có điều kiện"
-essence: "TODO(owner): verify wording"
+essence: "Một mô hình không có boundary condition là một mô hình nguy hiểm."
 ---
 Không nói “X đúng.” Nói:
 

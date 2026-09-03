@@ -6,7 +6,7 @@ quyenTitle: "Cầu Nguyên"
 order: 2
 number: 5
 title: "Tìm những biến thực sự chi phối kết quả"
-essence: "TODO(owner): verify wording"
+essence: "Người mạnh tìm leverage."
 ---
 Trong một vấn đề có thể có 100 yếu tố. Không phải yếu tố nào cũng quan trọng. Hỏi:
 

@@ -6,7 +6,7 @@ quyenTitle: "Học Chiến"
 order: 3
 number: 27
 title: "Giữ exploration budget"
-essence: "TODO(owner): verify wording"
+essence: "Exploration không được phép ăn hết resource của exploitation."
 ---
 Không phải mọi thứ phải có ROI. Dành một phần tài nguyên cho:
 

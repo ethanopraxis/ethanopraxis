@@ -6,7 +6,7 @@ quyenTitle: "Quan Thế"
 order: 2
 number: 2
 title: "Phân biệt mục tiêu với phương tiện"
-essence: "TODO(owner): verify wording"
+essence: "Đừng trung thành với phương tiện khi mục tiêu còn có đường khác."
 ---
 Một người có thể nói:
 
