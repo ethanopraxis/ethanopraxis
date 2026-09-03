@@ -1,0 +1,144 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import VideoFacade from '../../components/VideoFacade.astro';
+import { getCatalog, type Item } from '../../lib/catalog';
+import { parseChapters, stripChapters } from '../../lib/chapters';
+import { PHAP_TITLE, type Phap } from '../../lib/doctrine';
+import { href } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const catalog = await getCatalog();
+  return catalog
+    .filter((item) => item.youtubeId)
+    .map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+const { item } = Astro.props as { item: Item };
+const chapters = parseChapters(item.description);
+const description = stripChapters(item.description);
+
+// Resolve method ids to their doctrine node titles.
+const dieu = await getCollection('dieu');
+const methods = item.method
+  .map((id) => {
+    const [phap, slug] = id.split('/');
+    const entry = dieu.find((d) => d.id === `${phap}/${slug}`);
+    return entry ? { id, phap: phap as Phap, slug: slug!, title: entry.data.title } : null;
+  })
+  .filter((m): m is NonNullable<typeof m> => m !== null);
+
+const published = new Date(item.publishedAt).toLocaleDateString('vi-VN', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+
+/** Turn bare URLs in the description into links, escaping everything else. */
+function linkify(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return escaped.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    (url) => `<a href="${url}" rel="nofollow noopener">${url}</a>`
+  );
+}
+---
+
+<Base title={`${item.title} — Ethano`} description={description.slice(0, 160) || item.title}>
+  <article class="video">
+    <nav class="crumb" aria-label="Đường dẫn">
+      <a href={href('/')}>Ethano</a> <span aria-hidden="true">·</span> <span>Video</span>
+    </nav>
+
+    <VideoFacade youtubeId={item.youtubeId!} title={item.title} />
+
+    <h1 class="video__title">{item.title}</h1>
+    <p class="video__meta">
+      <span>{published}</span>
+      {item.durationSec > 0 && (
+        <><span aria-hidden="true">·</span><span>{Math.round(item.durationSec / 60)} phút</span></>
+      )}
+    </p>
+
+    {methods.length > 0 && (
+      <section class="video__methods">
+        <h2 class="video__h2">Điều binh pháp áp dụng</h2>
+        <ul class="chips">
+          {methods.map((m) => (
+            <li><a class="chip" href={href(`/binh-phap/${m.phap}/${m.slug}/`)}>{m.title}</a></li>
+          ))}
+        </ul>
+        <p class="video__phap">
+          {[...new Set(methods.map((m) => m.phap))].map((p) => (
+            <a href={href(`/binh-phap/${p}/`)}>{PHAP_TITLE[p]}</a>
+          ))}
+        </p>
+      </section>
+    )}
+
+    {chapters.length > 0 && (
+      <section class="video__chapters">
+        <h2 class="video__h2">Chương</h2>
+        <ol class="chapters">
+          {chapters.map((c) => (
+            <li><button type="button" data-seek={c.seconds}><span class="chapters__t">{c.stamp}</span> {c.label}</button></li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {description && (
+      <section class="video__desc prose">
+        <h2 class="video__h2">Mô tả</h2>
+        <p set:html={linkify(description).replace(/\n/g, '<br />')} />
+      </section>
+    )}
+  </article>
+</Base>
+
+<script>
+  // Chapter links seek the player; before first play they set the facade's start.
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-seek]')) {
+    btn.addEventListener('click', () => {
+      const seconds = btn.dataset.seek!;
+      const facade = document.querySelector<HTMLElement>('[data-facade]');
+      if (!facade) return;
+      const frame = facade.querySelector('iframe');
+      if (frame) {
+        const id = facade.dataset.id;
+        frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&start=${seconds}`;
+      } else {
+        facade.dataset.start = seconds;
+        facade.querySelector('button')?.click();
+      }
+      facade.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+</script>
+
+<style>
+  .video { padding-block: var(--space-4); max-inline-size: 56rem; }
+  .crumb { font-size: var(--step--1); color: var(--ink-soft); margin-block-end: var(--space-2); }
+  .video__title { font-size: var(--step-2); margin-block-start: var(--space-3); max-inline-size: 30ch; }
+  .video__meta {
+    display: flex; gap: var(--space-1); align-items: baseline;
+    color: var(--ink-soft); font-size: var(--step--1); margin-block-start: var(--space-1);
+  }
+  .video__h2 { font-size: var(--step-0); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .video__methods, .video__chapters, .video__desc { margin-block-start: var(--space-4); }
+  .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-1); margin-block-start: var(--space-2); }
+  .chip {
+    display: inline-block; border: 1px solid var(--line); background: var(--paper-warm);
+    padding: 0.15em 0.6em; text-decoration: none; font-size: var(--step--1);
+  }
+  .chip:hover { border-color: var(--ink-soft); }
+  .video__phap { margin-block-start: var(--space-1); font-size: var(--step--1); }
+  .chapters { list-style: none; padding: 0; margin-block-start: var(--space-2); max-inline-size: var(--measure); }
+  .chapters li { border-block-end: 1px solid var(--line); }
+  .chapters button {
+    display: flex; gap: var(--space-2); inline-size: 100%; text-align: start;
+    background: none; border: 0; padding: var(--space-1) 0; font: inherit; color: inherit; cursor: pointer;
+  }
+  .chapters button:hover { color: var(--vermilion-ink); }
+  .chapters__t { color: var(--ink-soft); font-variant-numeric: tabular-nums; flex: none; font-size: 1.05rem; }
+  .video__desc p { max-inline-size: var(--measure); }
+</style>

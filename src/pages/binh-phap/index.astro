@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getQuyens, getMatter, PHAP_TITLE, type Phap } from '../../lib/doctrine';
+import { href } from '../../lib/url';
+
+const PHAPS: Phap[] = ['kien-khiem', 'nhu-tinh'];
+const doctrines = await Promise.all(
+  PHAPS.map(async (phap) => ({
+    phap,
+    quyens: await getQuyens(phap),
+    opening: getMatter(phap, 0),
+  }))
+);
+---
+<Base title="Binh pháp — Ethano" description="Hai bộ binh pháp: Kiển – Khiêm và Nhu – Tỉnh.">
+  <section class="bp">
+    <h1 class="bp__h">Binh pháp</h1>
+    <div class="bp__grid">
+      {doctrines.map(({ phap, quyens, opening }) => (
+        <a class="bp__card" href={href(`/binh-phap/${phap}/`)}>
+          <h2 class="bp__title">{PHAP_TITLE[phap]}</h2>
+          {opening?.subtitle && <p class="bp__sub">{opening.subtitle}</p>}
+          <p class="bp__count">
+            {quyens.length} quyển · {quyens.reduce((n, q) => n + q.nodes.length, 0)} mục
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .bp { padding-block: var(--space-4); }
+  .bp__h { font-size: var(--step-2); margin-block-end: var(--space-3); }
+  .bp__grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .bp__card {
+    display: block; background: var(--paper-warm); border: 1px solid var(--line);
+    padding: var(--space-3); text-decoration: none; rotate: -0.5deg;
+  }
+  .bp__card:nth-child(even) { rotate: 0.5deg; }
+  .bp__title { font-size: var(--step-1); }
+  .bp__sub { color: var(--ink-soft); font-style: italic; margin-block-start: var(--space-1); }
+  .bp__count { color: var(--ink-soft); font-size: var(--step--1); margin-block-start: var(--space-2); }
+</style>

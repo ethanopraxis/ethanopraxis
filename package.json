@@ -7,15 +7,21 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "prebuild": "node scripts/build-search.mjs",
+    "budget": "node scripts/check-budget.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/lora": "^5.3.0",
-    "astro": "^7.2.10"
+    "@orama/orama": "^3.1.18",
+    "astro": "^7.2.10",
+    "d3-shape": "^3.2.0",
+    "gsap": "^3.15.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@types/d3-shape": "^3.2.0",
     "typescript": "^6.0.3"
   }
 }

@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { href } from '../lib/url';
+---
+<Base title="Tìm — Ethano" description="Tìm trong hai bộ binh pháp và toàn bộ video của Ethano.">
+  <section class="find">
+    <h1 class="find__h">Tìm</h1>
+    <p class="find__hint">Gõ có dấu hay không dấu đều được — <em>dao gieng</em> tìm ra <em>đào giếng</em>.</p>
+
+    <div class="searchbox find__box" data-search data-src={href('/search-docs.json')}>
+      <label class="visually-hidden" for="q">Từ khoá</label>
+      <input id="q" type="search" autocomplete="off" placeholder="đào giếng, premortem, điều 17…" />
+      <div class="facets" role="group" aria-label="Lọc">
+        <button type="button" data-facet="type" data-value="dieu" aria-pressed="false">Binh pháp</button>
+        <button type="button" data-facet="type" data-value="video" aria-pressed="false">Video</button>
+        <button type="button" data-facet="type" data-value="short" aria-pressed="false">Short</button>
+        <button type="button" data-facet="phap" data-value="kien-khiem" aria-pressed="false">Kiển – Khiêm</button>
+        <button type="button" data-facet="phap" data-value="nhu-tinh" aria-pressed="false">Nhu – Tỉnh</button>
+      </div>
+      <ul class="sr find__results" data-search-results aria-live="polite"></ul>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { attach } from '../islands/search';
+  attach();
+  document.querySelector<HTMLInputElement>('#q')?.focus();
+</script>
+
+<style>
+  .find { padding-block: var(--space-4); max-inline-size: 48rem; }
+  .find__h { font-size: var(--step-2); }
+  .find__hint { color: var(--ink-soft); margin-block: var(--space-1) var(--space-3); }
+  .find__box input { font-size: var(--step-1); }
+  .find__results { margin-block-start: var(--space-2); border-block-start: 1px solid var(--line); }
+  .visually-hidden {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+</style>

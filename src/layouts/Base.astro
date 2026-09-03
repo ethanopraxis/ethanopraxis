@@ -2,6 +2,7 @@
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/prose.css';
+import '../styles/search.css';
 import loraVi from '../fonts/lora-vietnamese-wght-normal.woff2?url';
 import loraLatin from '../fonts/lora-latin-wght-normal.woff2?url';
 import { href } from '../lib/url';
@@ -18,11 +19,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 // Phase 0 ships one page. The rest of the nav is written but inert until its
 // route exists — a dead link is worse than a visibly unopened door.
 const nav = [
-  { label: 'Binh pháp', path: '/binh-phap/', ready: false },
+  { label: 'Binh pháp', path: '/binh-phap/', ready: true },
   { label: 'Địa hình', path: '/dia-hinh/', ready: false },
   { label: 'Thăm Thủy', path: '/tham-thuy/', ready: false },
   { label: 'Series', path: '/series/', ready: false },
-  { label: 'Tìm', path: '/tim/', ready: false },
+  { label: 'Tìm', path: '/tim/', ready: true },
 ];
 const here = Astro.url.pathname;
 ---
@@ -68,6 +69,11 @@ const here = Astro.url.pathname;
             )
           )}
         </nav>
+        <div class="searchbox masthead__search" data-search data-dropdown="true" data-src={href('/search-docs.json')}>
+          <label class="visually-hidden" for="site-search">Tìm trong trang</label>
+          <input id="site-search" type="search" autocomplete="off" placeholder="Tìm…" />
+          <ul class="sr" data-search-results aria-live="polite"></ul>
+        </div>
       </div>
     </header>
 
@@ -84,5 +90,10 @@ const here = Astro.url.pathname;
         </div>
       </div>
     </footer>
+    <script>
+      // Search boots on first focus; nothing search-related loads before that.
+      import { attach } from '../islands/search';
+      attach();
+    </script>
   </body>
 </html>

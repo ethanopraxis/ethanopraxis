@@ -1,0 +1,116 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { getQuyens, getMatter, nodeSlug, PHAP_TITLE, type Phap } from '../../../lib/doctrine';
+import { shown } from '../../../lib/todo';
+import { href } from '../../../lib/url';
+
+export function getStaticPaths() {
+  return (['kien-khiem', 'nhu-tinh'] as Phap[]).map((phap) => ({ params: { phap } }));
+}
+
+const phap = Astro.params.phap as Phap;
+const quyens = await getQuyens(phap);
+const opening = getMatter(phap, 0);
+const closing = getMatter(phap, 99);
+const title = PHAP_TITLE[phap];
+const nodeCount = quyens.reduce((n, q) => n + q.nodes.length, 0);
+const other: Phap = phap === 'kien-khiem' ? 'nhu-tinh' : 'kien-khiem';
+---
+
+<Base
+  title={`${title} — Ethano`}
+  description={`Toàn văn ${title}: ${quyens.length} quyển, ${nodeCount} mục.`}
+>
+  <article class="doctrine">
+    <nav class="crumb" aria-label="Đường dẫn">
+      <a href={href('/')}>Ethano</a> <span aria-hidden="true">·</span> <span>Binh pháp</span>
+    </nav>
+
+    <h1 class="doctrine__title">{title}</h1>
+    {opening?.subtitle && <p class="doctrine__lede">{opening.subtitle}</p>}
+
+    {opening?.preamble && (
+      <section class="matter prose">
+        <h2 class="matter__label">{opening.title}</h2>
+        <Fragment set:html={opening.preamble.split('\n\n').map((p) => `<p>${p}</p>`).join('')} />
+      </section>
+    )}
+
+    {quyens.map((q) => (
+      <section class="quyen" id={`quyen-${q.quyen}`}>
+        <h2 class="quyen__head">
+          <span class="quyen__num">Quyển {q.roman}</span>
+          <span class="quyen__title">{q.title}</span>
+        </h2>
+        {q.subtitle && <p class="quyen__sub">{q.subtitle}</p>}
+        <ol class="quyen__list">
+          {q.nodes.map((node) => (
+            <li>
+              <a href={href(`/binh-phap/${phap}/${nodeSlug(node)}/`)}>
+                {node.data.number !== undefined && <span class="quyen__n">{node.data.number}</span>}
+                <span>{node.data.title}</span>
+              </a>
+              {shown(node.data.essence) && <p class="quyen__essence">{shown(node.data.essence)}</p>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+
+    {closing?.preamble && (
+      <section class="matter prose">
+        <h2 class="matter__label">{closing.title}</h2>
+        <Fragment set:html={closing.preamble.split('\n\n').map((p) => `<p>${p}</p>`).join('')} />
+      </section>
+    )}
+
+    <p class="doctrine__switch">
+      <a href={href(`/binh-phap/${other}/`)}>Đọc {PHAP_TITLE[other]} →</a>
+    </p>
+  </article>
+</Base>
+
+<style>
+  .doctrine { padding-block: var(--space-4) var(--space-4); }
+  .crumb { font-size: var(--step--1); color: var(--ink-soft); margin-block-end: var(--space-2); }
+  .doctrine__title { font-size: var(--step-3); max-inline-size: 18ch; }
+  .doctrine__lede {
+    font-size: var(--step-1); font-style: italic; color: var(--ink-soft);
+    max-inline-size: var(--measure); margin-block-start: var(--space-2);
+  }
+  .matter {
+    margin-block: var(--space-4);
+    padding-inline-start: var(--space-2);
+    border-inline-start: 2px solid var(--line);
+  }
+  .matter__label {
+    font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-soft); margin-block-end: var(--space-1);
+  }
+  .quyen { margin-block-start: var(--space-4); scroll-margin-block-start: var(--space-3); }
+  .quyen__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); }
+  .quyen__num {
+    font-size: var(--step--1); letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--vermilion-ink);
+  }
+  .quyen__title { font-size: var(--step-1); }
+  .quyen__sub { color: var(--ink-soft); font-style: italic; }
+  .quyen__list {
+    list-style: none; padding: 0; margin-block-start: var(--space-2);
+    border-block-start: 1px solid var(--line);
+  }
+  .quyen__list li { border-block-end: 1px solid var(--line); padding-block: var(--space-1); }
+  .quyen__list a {
+    display: flex; gap: var(--space-2); text-decoration: none; align-items: baseline;
+  }
+  .quyen__list a:hover span:last-child { text-decoration: underline; }
+  .quyen__n {
+    flex: none; inline-size: 2ch; text-align: end;
+    color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 1.05rem;
+  }
+  .quyen__essence {
+    color: var(--ink-soft); font-style: italic; margin-inline-start: calc(2ch + var(--space-2));
+    max-inline-size: var(--measure);
+  }
+  .doctrine__switch { margin-block-start: var(--space-5); font-size: var(--step-1); }
+</style>

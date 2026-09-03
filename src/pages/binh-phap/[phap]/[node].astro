@@ -1,0 +1,137 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import ItemCard from '../../../components/ItemCard.astro';
+import { getQuyens, nodeSlug, PHAP_TITLE, type Phap } from '../../../lib/doctrine';
+import { getCatalog, itemsForMethod } from '../../../lib/catalog';
+import { shown } from '../../../lib/todo';
+import { href } from '../../../lib/url';
+
+export async function getStaticPaths() {
+  const all = await getCollection('dieu');
+  return all.map((entry) => ({
+    params: { phap: entry.data.phap, node: entry.id.split('/').pop()! },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const phap = entry.data.phap as Phap;
+const { Content } = await render(entry);
+
+// Neighbours inside the same quyển, so "tiếp theo" follows the reading order.
+const quyens = await getQuyens(phap);
+const quyen = quyens.find((q) => q.quyen === entry.data.quyen)!;
+const idx = quyen.nodes.findIndex((n) => n.id === entry.id);
+const prev = quyen.nodes[idx - 1] ?? null;
+const next = quyen.nodes[idx + 1] ?? null;
+
+const id = `${phap}/${nodeSlug(entry)}`;
+const items = itemsForMethod(await getCatalog(), id);
+const essence = shown(entry.data.essence);
+const KIND_LABEL: Record<string, string> = {
+  dieu: 'Điều', ky: 'Kỵ', 'nguyen-tac': 'Nguyên tắc', tran: 'Trận',
+  'that-bai': 'Thất bại', 'menh-lenh': 'Mệnh lệnh', 'khau-quyet': 'Khẩu quyết',
+  'quy-luat': 'Quy luật', buoc: 'Bước',
+};
+const kindLabel = KIND_LABEL[entry.data.kind] ?? '';
+const heading = entry.data.number !== undefined ? `${kindLabel} ${entry.data.number}` : kindLabel;
+---
+
+<Base
+  title={`${entry.data.title} — ${PHAP_TITLE[phap]}`}
+  description={essence ?? `${heading}, Quyển ${quyen.roman} — ${quyen.title}. ${PHAP_TITLE[phap]}.`}
+>
+  <article class="node">
+    <nav class="crumb" aria-label="Đường dẫn">
+      <a href={href('/')}>Ethano</a> <span aria-hidden="true">·</span>
+      <a href={href(`/binh-phap/${phap}/`)}>{PHAP_TITLE[phap]}</a> <span aria-hidden="true">·</span>
+      <a href={href(`/binh-phap/${phap}/#quyen-${quyen.quyen}`)}>Quyển {quyen.roman}</a>
+    </nav>
+
+    <p class="node__kicker">{heading} <span aria-hidden="true">·</span> {quyen.title}</p>
+    <h1 class="node__title">{entry.data.title}</h1>
+    {essence && <p class="node__essence">{essence}</p>}
+
+    <div class="prose node__body"><Content /></div>
+
+    {entry.data.saiKhi && (
+      <aside class="callout">
+        <p class="callout__label">Sai khi</p>
+        <p>{entry.data.saiKhi}</p>
+      </aside>
+    )}
+    {entry.data.kiemBang && (
+      <aside class="callout">
+        <p class="callout__label">Kiểm bằng</p>
+        <p>{entry.data.kiemBang}</p>
+      </aside>
+    )}
+
+    {items.length > 0 && (
+      <section class="node__items">
+        <h2 class="node__h2">Video áp dụng điều này</h2>
+        <div class="grid">{items.map((item) => <ItemCard item={item} />)}</div>
+      </section>
+    )}
+
+    <nav class="pager" aria-label="Trong quyển này">
+      {prev ? (
+        <a class="pager__link" href={href(`/binh-phap/${phap}/${nodeSlug(prev)}/`)}>
+          <span class="pager__dir">← Trước</span><span>{prev.data.title}</span>
+        </a>
+      ) : <span />}
+      {next ? (
+        <a class="pager__link pager__link--next" href={href(`/binh-phap/${phap}/${nodeSlug(next)}/`)}>
+          <span class="pager__dir">Tiếp →</span><span>{next.data.title}</span>
+        </a>
+      ) : <span />}
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .node { padding-block: var(--space-4); max-inline-size: 60rem; }
+  .crumb { font-size: var(--step--1); color: var(--ink-soft); margin-block-end: var(--space-3); }
+  .crumb a { text-decoration: none; }
+  .crumb a:hover { text-decoration: underline; }
+  .node__kicker {
+    font-size: var(--step--1); letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--vermilion-ink);
+  }
+  .node__title { font-size: var(--step-2); max-inline-size: 24ch; margin-block-start: var(--space-1); }
+  .node__essence {
+    font-style: italic; font-size: var(--step-1); color: var(--ink-soft);
+    max-inline-size: var(--measure); margin-block-start: var(--space-2);
+  }
+  .node__body { margin-block-start: var(--space-3); }
+  .callout {
+    margin-block-start: var(--space-3);
+    max-inline-size: var(--measure);
+    border: 1px solid var(--line);
+    padding: var(--space-2);
+    background: var(--paper-warm);
+  }
+  .callout__label {
+    font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--vermilion-ink); margin-block-end: 0.25rem;
+  }
+  .node__items { margin-block-start: var(--space-5); }
+  .node__h2 { font-size: var(--step-1); margin-block-end: var(--space-2); }
+  .grid {
+    display: grid; gap: var(--space-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  }
+  .pager {
+    display: flex; justify-content: space-between; gap: var(--space-3);
+    margin-block-start: var(--space-5); padding-block-start: var(--space-2);
+    border-block-start: 1px solid var(--line);
+  }
+  .pager__link {
+    display: flex; flex-direction: column; gap: 0.2rem;
+    text-decoration: none; max-inline-size: 22ch;
+  }
+  .pager__link--next { text-align: end; }
+  .pager__dir { font-size: var(--step--1); color: var(--ink-soft); }
+  .pager__link:hover span:last-child { text-decoration: underline; }
+</style>

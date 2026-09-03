@@ -550,18 +550,18 @@ Never print or commit secret values. `ANTHROPIC_API_KEY` is Phase 3 only.
 - **STOP. Show the owner the URL.**
 
 ### Phase 1 — MVP: map, doctrine, videos, search (~1 week)
-- [ ] Write `src/data/doctrine-seed.json` from Appendix A verbatim.
-- [ ] `scripts/extract-doctrine.mjs` (or do it directly): for each seed node, create
+- [x] Write `src/data/doctrine-seed.json` from Appendix A verbatim.
+- [x] `scripts/extract-doctrine.mjs` (or do it directly): for each seed node, create
       `src/content/dieu/<phap>/<node>.md` — frontmatter from seed, `essence` = the node's
       key line, body = full verbatim text read from the PDFs in `docs/source/`.
       Missing PDFs → stub body with `TODO(owner)`.
-- [ ] `content.config.ts` (§5); `catalog.ts`, `foldVi.ts`, `chapters.ts`, `stamps.ts`.
-- [ ] `map.json.ts` endpoint (§7 geometry) + `doctrine-map.ts` island + preview card.
-- [ ] Node pages `/binh-phap/[phap]/[node]/` + quyển index + semantic index on home.
-- [ ] `sync-youtube.mjs` + `sync.yml`; first sync committed; `/video/[id]/` basic pages
+- [x] `content.config.ts` (§5); `catalog.ts`, `foldVi.ts`, `chapters.ts`, `stamps.ts`.
+- [x] `map.json.ts` endpoint (§7 geometry) + `doctrine-map.ts` island + preview card.
+- [x] Node pages `/binh-phap/[phap]/[node]/` + quyển index + semantic index on home.
+- [x] `sync-youtube.mjs` + `sync.yml`; first sync committed; `/video/[id]/` basic pages
       with `VideoFacade` (châu phê layout is Phase 2 — simple stack is fine here).
-- [ ] `build-search.mjs` + `search.ts` island + `/tim/` page; doctrine nodes searchable.
-- [ ] Sitemap, canonical URLs, OG tags (text-only OG for now).
+- [x] `build-search.mjs` + `search.ts` island + `/tim/` page; doctrine nodes searchable.
+- [x] Sitemap, canonical URLs, OG tags (text-only OG for now).
 - **Done when:** budgets in §11 pass; map keyboard-navigable; search finds
       "dao gieng khong day" → Định Luật Cái Giếng content.
 - **Điều 17 gate (the owner runs):** 3 non-specialists, task "tìm video về đào giếng" — ≤ 15 s

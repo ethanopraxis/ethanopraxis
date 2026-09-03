@@ -1,0 +1,78 @@
+---
+import { href } from '../lib/url';
+import type { Item } from '../lib/catalog';
+
+interface Props { item: Item }
+const { item } = Astro.props;
+
+const TYPE_LABEL: Record<Item['type'], string> = {
+  video: 'Video',
+  short: 'Short',
+  'series-episode': 'Tập',
+  'course-lesson': 'Bài học',
+};
+const mins = Math.round(item.durationSec / 60);
+const duration = item.durationSec === 0 ? null
+  : item.durationSec < 60 ? `${item.durationSec} giây` : `${mins} phút`;
+---
+<a class="card" href={href(`/video/${item.id}/`)}>
+  {item.youtubeId && (
+    <img
+      class="card__thumb"
+      src={`https://i.ytimg.com/vi/${item.youtubeId}/hqdefault.jpg`}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      width="480"
+      height="360"
+    />
+  )}
+  <div class="card__body">
+    <p class="card__meta">
+      <span class="chip">{TYPE_LABEL[item.type]}</span>
+      {duration && <span>{duration}</span>}
+    </p>
+    <p class="card__title">{item.title}</p>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+    text-decoration: none;
+    rotate: -0.6deg;
+    transition: rotate 120ms ease;
+  }
+  .card:nth-child(even) { rotate: 0.7deg; }
+  .card:hover, .card:focus-visible { rotate: 0deg; }
+  .card__thumb {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-block-end: 1px solid var(--line);
+    filter: saturate(0.85);
+  }
+  .card__body { padding: var(--space-2); }
+  .card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    margin-block-end: 0.35rem;
+  }
+  .chip {
+    border: 1px solid var(--line);
+    padding: 0.05em 0.5em;
+    letter-spacing: 0.04em;
+  }
+  .card__title { line-height: 1.4; }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>

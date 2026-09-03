@@ -1,0 +1,83 @@
+---
+/**
+ * Thumbnail + play button. The YouTube iframe is injected on click only —
+ * no third-party frame, cookie or script before the visitor asks for one.
+ */
+interface Props { youtubeId: string; title: string }
+const { youtubeId, title } = Astro.props;
+---
+<div class="facade" data-facade data-id={youtubeId}>
+  <img
+    class="facade__thumb"
+    src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+    alt=""
+    width="480" height="360" decoding="async"
+  />
+  <button class="facade__play" type="button">
+    <span class="facade__disc" aria-hidden="true">▶</span>
+    <span class="facade__label">Xem: {title}</span>
+  </button>
+</div>
+
+<style>
+  .facade {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--paper-shadow);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .facade__thumb, .facade :global(iframe) {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    border: 0;
+  }
+  .facade__play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+  }
+  .facade__disc {
+    inline-size: 4rem;
+    block-size: 4rem;
+    display: grid;
+    place-items: center;
+    background: var(--vermilion);
+    color: var(--paper-warm);
+    border-radius: var(--radius-seal);
+    rotate: -3deg;
+    font-size: 1.5rem;
+    padding-inline-start: 0.15em;
+  }
+  /* The label is for screen readers and keyboard users, not the layout. */
+  .facade__label {
+    position: absolute;
+    inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  for (const el of document.querySelectorAll<HTMLElement>('[data-facade]')) {
+    el.querySelector('button')?.addEventListener('click', () => {
+      const id = el.dataset.id;
+      const start = el.dataset.start ? `&start=${el.dataset.start}` : '';
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${start}`;
+      frame.title = 'YouTube';
+      frame.allow = 'accelerometer; autoplay; encrypted-media; picture-in-picture';
+      frame.allowFullscreen = true;
+      el.replaceChildren(frame);
+    });
+  }
+</script>

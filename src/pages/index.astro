@@ -1,5 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
+import ItemCard from '../components/ItemCard.astro';
+import { getQuyens, nodeSlug, PHAP_TITLE, type Phap } from '../lib/doctrine';
+import { getCatalog } from '../lib/catalog';
+import { shown } from '../lib/todo';
+import { href } from '../lib/url';
+
+const PHAPS: Phap[] = ['kien-khiem', 'nhu-tinh'];
+const doctrines = await Promise.all(PHAPS.map(async (phap) => ({ phap, quyens: await getQuyens(phap) })));
+const latest = (await getCatalog()).slice(0, 6);
 
 const title = 'Ethano — Binh pháp cho những quyết định không có công thức';
 const description =
@@ -11,66 +20,136 @@ const description =
   <section class="hero">
     <h1 class="hero__title">
       Binh pháp cho những quyết định<br />không có công thức
-      <!-- One signature visual: a single ink stroke, drawn once, no motion. -->
       <svg class="hero__stroke" viewBox="0 0 600 18" preserveAspectRatio="none" aria-hidden="true">
-        <path
-          d="M4 12 C 96 4, 168 15, 262 8 S 430 3, 528 11 596 7 596 7"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.4"
-          stroke-linecap="round"
-        />
+        <path d="M4 12 C 96 4, 168 15, 262 8 S 430 3, 528 11 596 7 596 7"
+          fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
       </svg>
     </h1>
-
     <!-- TODO(owner): verify wording of this standfirst (my copy, not doctrine text). -->
-    <p class="hero__lede prose">
+    <p class="hero__lede">
       Hai bộ binh pháp — <em>Binh Pháp Kiển–Khiêm</em> và <em>Binh Pháp Nhu–Tỉnh</em> —
       là cách tổ chức của trang này. Mỗi nội dung được đặt trên hai trục:
-      <strong>phương pháp</strong> (điều nào của binh pháp) và
-      <strong>địa hình</strong> (áp dụng vào lĩnh vực nào).
-    </p>
-
-    <hr class="hero__rule" />
-
-    <p class="hero__status">
-      Trang đang được dựng. Bản đồ binh pháp, Thăm Thủy và tìm kiếm sẽ lên trong các
-      giai đoạn kế tiếp. Trong lúc chờ, mời xem
-      <a href="https://www.youtube.com/@EthanoPraxis">kênh YouTube</a>.
+      <strong>phương pháp</strong> và <strong>địa hình</strong>.
     </p>
   </section>
+
+  <!-- The map is an alternative view of the index below it, never the only path. -->
+  <section class="map" data-map data-src={href('/map.json')} aria-labelledby="map-h">
+    <h2 class="visually-hidden" id="map-h">Bản đồ binh pháp</h2>
+    <p class="map__placeholder">Bản đồ binh pháp — danh sách đầy đủ nằm ngay bên dưới.</p>
+    <div class="map__preview" hidden>
+      <p class="map__preview-title"></p>
+      <p class="map__preview-essence"></p>
+      <p class="map__preview-meta"></p>
+    </div>
+  </section>
+
+  <section class="index" aria-labelledby="index-h">
+    <h2 class="index__h" id="index-h">Mục lục binh pháp</h2>
+    <div class="index__cols">
+      {doctrines.map(({ phap, quyens }) => (
+        <div class="index__col">
+          <h3 class="index__phap"><a href={href(`/binh-phap/${phap}/`)}>{PHAP_TITLE[phap]}</a></h3>
+          {quyens.map((q) => (
+            <details class="index__quyen">
+              <summary>
+                <span class="index__num">Quyển {q.roman}</span>
+                <span>{q.title}</span>
+              </summary>
+              <ul>
+                {q.nodes.map((node) => (
+                  <li>
+                    <a href={href(`/binh-phap/${phap}/${nodeSlug(node)}/`)}>{node.data.title}</a>
+                    {shown(node.data.essence) && <span class="index__essence">{shown(node.data.essence)}</span>}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {latest.length > 0 && (
+    <section class="latest" aria-labelledby="latest-h">
+      <h2 class="index__h" id="latest-h">Mới đào</h2>
+      <div class="grid">{latest.map((item) => <ItemCard item={item} />)}</div>
+    </section>
+  )}
 </Base>
 
+<script>
+  // Lazier than client:visible — GSAP and the island itself are only fetched
+  // once the map is actually approaching the viewport.
+  const host = document.querySelector<HTMLElement>('[data-map]');
+  if (host) {
+    // Reserve the box now so inserting the SVG later shifts nothing.
+    // Set inline: with no JS the style never lands and no dead space appears.
+    host.style.aspectRatio = '720 / 640';
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      import('../islands/doctrine-map').then((m) => m.mount(host)).catch(() => {});
+    }, { rootMargin: '200px' });
+    io.observe(host);
+  }
+</script>
+
 <style>
-  .hero {
-    padding-block: clamp(2.5rem, 8vw, 6rem) var(--space-4);
-  }
-  .hero__title {
-    position: relative;
-    font-size: var(--step-3);
-    max-inline-size: 20ch;
-    margin-block-end: var(--space-4);
-  }
+  .hero { padding-block: clamp(2rem, 6vw, 4.5rem) var(--space-3); }
+  .hero__title { position: relative; font-size: var(--step-3); max-inline-size: 20ch; }
   .hero__stroke {
-    display: block;
-    inline-size: min(100%, 30ch);
-    block-size: 0.5em;
-    margin-block-start: 0.15em;
-    color: var(--ink);
-    opacity: 0.75;
+    display: block; inline-size: min(100%, 30ch); block-size: 0.5em;
+    margin-block-start: 0.15em; color: var(--ink); opacity: 0.75;
   }
   .hero__lede {
-    font-size: var(--step-1);
-    color: var(--ink-soft);
+    font-size: var(--step-1); color: var(--ink-soft);
+    max-inline-size: var(--measure); margin-block-start: var(--space-3);
   }
-  .hero__rule {
-    border: 0;
-    border-block-start: 1px solid var(--line);
-    max-inline-size: var(--measure);
-    margin-block: var(--space-4);
+
+  .map { position: relative; margin-block: var(--space-4); }
+  .map__placeholder { color: var(--ink-soft); font-style: italic; }
+  .map :global(.map__svg) { display: block; inline-size: 100%; block-size: auto; }
+  .map :global(.map__edge) { stroke: var(--ink); stroke-width: 1.1; stroke-linecap: round; opacity: 0.4; }
+  .map :global(.map__centre) { fill: var(--ink); }
+  .map :global(.map__ring) { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+  .map :global(.map__ring.is-visited) { fill: var(--paper-shadow); }
+  .map :global(.map__has-video) { fill: var(--vermilion); }
+  .map :global(.map__hit) { fill: transparent; }
+  .map :global(.map__node) { cursor: pointer; }
+  .map :global(.map__node:hover .map__ring),
+  .map :global(.map__node:focus-visible .map__ring) { stroke-width: 2.6; }
+  .map :global(.map__node:focus-visible) { outline: 2px solid var(--vermilion); outline-offset: 2px; }
+  .map__preview {
+    position: absolute; inset-block-start: 0; inset-inline-end: 0;
+    max-inline-size: 22rem; background: var(--paper-warm);
+    border: 1px solid var(--line); padding: var(--space-2); rotate: -1.5deg;
   }
-  .hero__status {
-    max-inline-size: var(--measure);
-    color: var(--ink-soft);
+  .map__preview-title { font-size: var(--step-0); }
+  .map__preview-essence { color: var(--ink-soft); font-style: italic; }
+  .map__preview-meta { font-size: var(--step--1); color: var(--ink-soft); margin-block-start: 0.25rem; }
+
+  .index { margin-block-start: var(--space-5); }
+  .index__h { font-size: var(--step-1); margin-block-end: var(--space-3); }
+  .index__cols { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
+  .index__phap { font-size: var(--step-0); letter-spacing: 0.06em; margin-block-end: var(--space-2); }
+  .index__quyen { border-block-start: 1px solid var(--line); }
+  .index__quyen summary {
+    display: flex; gap: var(--space-2); align-items: baseline;
+    padding-block: var(--space-1); cursor: pointer;
+  }
+  .index__num {
+    font-size: var(--step--1); letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--vermilion-ink); flex: none;
+  }
+  .index__quyen ul { list-style: none; padding: 0 0 var(--space-2) 0; margin: 0; }
+  .index__quyen li { padding-block: 0.2rem; }
+  .index__essence { display: block; color: var(--ink-soft); font-style: italic; font-size: var(--step--1); }
+  .latest { margin-block-start: var(--space-5); }
+  .grid { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+  .visually-hidden {
+    position: absolute; inline-size: 1px; block-size: 1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
 </style>
