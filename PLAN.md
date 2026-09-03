@@ -564,7 +564,8 @@ Never print or commit secret values. `ANTHROPIC_API_KEY` is Phase 3 only.
 - [x] Sitemap, canonical URLs, OG tags (text-only OG for now).
 - **Done when:** budgets in §11 pass; map keyboard-navigable; search finds
       "dao gieng khong day" → Định Luật Cái Giếng content.
-- **Điều 17 gate (the owner runs):** 3 non-specialists, task "tìm video về đào giếng" — ≤ 15 s
+- **Điều 17 gate (the owner runs): PASSED** — found in under 15 s.
+      3 non-specialists, task "tìm video về đào giếng" — ≤ 15 s
       each. Fail → fix discoverability before Phase 2.
 - **STOP.**
 
