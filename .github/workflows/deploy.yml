@@ -23,6 +23,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Fails loudly with the fix if the lockfile lost its Linux optional deps.
+      - run: node scripts/check-lockfile.mjs
       - run: npm ci
       - run: npm run build
         env:
