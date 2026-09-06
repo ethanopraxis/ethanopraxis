@@ -32,7 +32,7 @@ const other: Phap = phap === 'kien-khiem' ? 'nhu-tinh' : 'kien-khiem';
     {opening?.preamble && (
       <section class="matter prose">
         <h2 class="matter__label">{opening.title}</h2>
-        <Fragment set:html={opening.preamble.split('\n\n').map((p) => `<p>${p}</p>`).join('')} />
+        {opening.preamble.split('\n\n').map((p) => <p>{p}</p>)}
       </section>
     )}
 
@@ -60,7 +60,7 @@ const other: Phap = phap === 'kien-khiem' ? 'nhu-tinh' : 'kien-khiem';
     {closing?.preamble && (
       <section class="matter prose">
         <h2 class="matter__label">{closing.title}</h2>
-        <Fragment set:html={closing.preamble.split('\n\n').map((p) => `<p>${p}</p>`).join('')} />
+        {closing.preamble.split('\n\n').map((p) => <p>{p}</p>)}
       </section>
     )}
 

@@ -45,6 +45,18 @@ positions from `/map.json`, no client-side force sim.
 Home JS ≤ 70 KB gz · other pages ≤ 25 KB gz · LCP ≤ 2.5 s mobile · CLS < 0.1 ·
 no YouTube iframe before click (facade) · every visual has a text path · keyboard works.
 
+## Before pushing to main
+`main` deploys straight to the public site — there is no staging step, so a
+problem caught later is a problem that was already published.
+
+1. `npm run preflight` — lockfile guard, `astro check`, build, JS budgets, `npm audit`.
+2. Run `/security-review` on the diff. Pay attention to anything touching
+   `set:html`, YouTube/API-supplied content, workflows, secrets, or new deps.
+3. Only then commit and push.
+
+Secret scanning and push protection are enabled on the repo; that is a backstop,
+not the review.
+
 ## Hygiene
 Conventional commits. Never commit secrets or echo them in logs. Never use
 localStorage/window at build time. Prefer deleting code over adding options — the

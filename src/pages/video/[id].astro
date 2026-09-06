@@ -32,12 +32,25 @@ const published = new Date(item.publishedAt).toLocaleDateString('vi-VN', {
   year: 'numeric', month: 'long', day: 'numeric',
 });
 
-/** Turn bare URLs in the description into links, escaping everything else. */
+/**
+ * Turn bare URLs in the description into links, escaping everything else.
+ *
+ * The quote characters matter: without them a description containing
+ * `https://x/"onmouseover="…` closes the href and injects an event handler.
+ * Escaping them first means a quote can only reach the output as an entity,
+ * which the parser decodes after attribute boundaries are already fixed.
+ */
+const escapeHtml = (s: string): string =>
+  s.replace(/&/g, '&amp;')
+   .replace(/</g, '&lt;')
+   .replace(/>/g, '&gt;')
+   .replace(/"/g, '&quot;')
+   .replace(/'/g, '&#39;');
+
 function linkify(text: string): string {
-  const escaped = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return escaped.replace(
-    /(https?:\/\/[^\s<]+)/g,
+  // Only http(s) is matched, so `javascript:` never becomes an href.
+  return escapeHtml(text).replace(
+    /(https?:\/\/[^\s<>"']+)/g,
     (url) => `<a href="${url}" rel="nofollow noopener">${url}</a>`
   );
 }
