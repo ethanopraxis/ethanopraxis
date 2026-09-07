@@ -14,16 +14,21 @@
     "preflight": "npm run check-lockfile && npm run build && npm run budget && npm audit --audit-level=high"
   },
   "dependencies": {
+    "@astrojs/react": "^6.0.5",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/lora": "^5.3.0",
     "@orama/orama": "^3.1.18",
     "astro": "^7.2.10",
     "d3-shape": "^3.2.0",
-    "gsap": "^3.15.0"
+    "gsap": "^3.15.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@types/d3-shape": "^3.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
     "typescript": "^6.0.3"
   }
 }
