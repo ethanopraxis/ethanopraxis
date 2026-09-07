@@ -208,9 +208,22 @@ export default function NenMong() {
     loadState(lang).then((loaded) => {
       if (!alive) return;
       const base: AppState = loaded || defaultState(DECK);
-      DECK.forEach((d) => { if (!base.nodes[d.id]) base.nodes[d.id] = freshNode(); });
-      if (base.lastBuildDate !== todayStr()) { base.lastBuildDate = todayStr(); base.buildsToday = 0; }
+      let merged = false;
+      DECK.forEach((d) => {
+        if (!base.nodes[d.id]) { base.nodes[d.id] = freshNode(); merged = true; }
+      });
+      if (base.lastBuildDate !== todayStr()) {
+        base.lastBuildDate = todayStr();
+        base.buildsToday = 0;
+        merged = true;
+      }
       setSnap({ lang, st: base });
+      // Write the merge back so stored state matches what is on screen. Without
+      // this it only landed on the next grade, so after a deck update storage
+      // still listed the old block count. Only when something actually changed,
+      // and only for state that already exists — browsing a language you have
+      // never practised still creates no key.
+      if (loaded && merged) void saveState(lang, base);
     });
     return () => { alive = false; };
   }, [lang, DECK]);
