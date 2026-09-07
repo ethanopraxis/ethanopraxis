@@ -1,3 +1,4 @@
+// deck v2 — 2026-09-06: +delta corpus (kiểm toán) +delta đối xứng (lint). Nội dung tác giả duyệt.
 import type { Drill } from "../../lib/nenmong/types";
 
 export const LEVELS: string[] = [
@@ -243,5 +244,52 @@ export const DECK: Drill[] = [
     id: "t-l5-dirs", lv: 5, t: "Duyệt 4 hướng lưới",
     p: "Từ ô (x, y): sinh 4 ô kề và lọc những ô nằm trong biên lưới m × n.",
     a: "const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];\nfor (const [dx, dy] of dirs) {\n    const nx = x + dx, ny = y + dy;\n    if (nx >= 0 && nx < m && ny >= 0 && ny < n) {\n        ...\n    }\n}",
+  },
+  {
+    id: "t-l2-substr", lv: 2, t: "Chuỗi con: slice",
+    p: "Hai biểu thức: chuỗi con của s từ l đến r-1; 3 ký tự cuối. Vì sao ưu tiên slice hơn substring?",
+    a: "s.slice(l, r)\ns.slice(-3)\n// substring(a, b) TỰ HOÁN ĐỔI khi a > b và coi số âm là 0 — slice nhất quán hơn.",
+  },
+  {
+    id: "t-l2-pal", lv: 2, t: "Palindrome",
+    p: "Một biểu thức boolean: s có phải palindrome không?",
+    a: "s === [...s].reverse().join('')",
+    n: "[...s] tách theo code point — an toàn hơn split('') (xem khối đảo chuỗi).",
+  },
+  {
+    id: "t-l4-freqmax", lv: 4, t: "Key có value lớn nhất",
+    p: "Tìm key có value lớn nhất trong Map cnt.",
+    a: "let bestK = '', bestV = -1;\nfor (const [k, v] of cnt) {\n    if (v > bestV) { bestK = k; bestV = v; }\n}",
+    n: "Map duyệt theo thứ tự CHÈN nên tie-break ổn định — trái với Go (ngẫu nhiên).",
+  },
+  {
+    id: "t-l5-bit", lv: 5, t: "Bit cơ bản",
+    p: "Năm biểu thức: kiểm tra x lẻ; chia đôi x; 2 mũ k; tắt bit 1 thấp nhất; XOR.",
+    a: "(x & 1) === 1\nx >> 1\n1 << k\nx & (x - 1)\nx ^ y",
+    n: "Bitwise ép toán hạng về int 32-bit CÓ DẤU — số > 2^31 sai lặng lẽ, (x / 2) | 0 cùng số phận; >>> là dịch không dấu. Và == mạnh hơn &: đóng ngoặc.",
+  },
+  {
+    id: "t-l5-dfs", lv: 5, t: "DFS lồng trong hàm giải",
+    p: "Viết khung dfs(u) lồng trong hàm giải, cập nhật biến đếm cnt bên ngoài.",
+    a: "let cnt = 0;\nfunction dfs(u: number): void {\n    cnt++;\n    for (const v of g[u]) dfs(v);\n}\ndfs(root);",
+    n: "Closure của JS gán lại biến ngoài TỰ DO — không cần nonlocal như Python. const dfs = (u: number) => {...} cũng tự gọi lại được.",
+  },
+  {
+    id: "t-l5-freq26", lv: 5, t: "Mảng đếm 26",
+    p: "Đếm tần suất chữ thường của s bằng mảng 26 phần tử.",
+    a: "const freq = new Array(26).fill(0);\nfor (const c of s) freq[c.charCodeAt(0) - 97]++;",
+    n: "Nhanh hơn Map khi bảng chữ cái cố định; 97 = 'a'.charCodeAt(0).",
+  },
+  {
+    id: "t-l3-prefix", lv: 3, t: "Prefix sum",
+    p: "Xây mảng cộng dồn p của nums sao cho p[i] = tổng i phần tử đầu (p[0] = 0).",
+    a: "const p = new Array(nums.length + 1).fill(0);\nfor (let i = 0; i < nums.length; i++) p[i + 1] = p[i] + nums[i];",
+    n: "Tổng đoạn nums[l..r] = p[r+1] - p[l]. Tổng vượt 2^53 - 1 thì chuyển BigInt.",
+  },
+  {
+    id: "t-l2-conv", lv: 2, t: "Đổi số ↔ chuỗi",
+    p: "Ba biểu thức: số 123 thành chuỗi; chuỗi '123' thành số; và hai bẫy của Number / parseInt?",
+    a: "String(123)\nNumber('123')       // hoặc +s\nparseInt(s, 10)     // LUÔN ghi radix 10\n// Bẫy: Number('') === 0 và Number('  ') === 0;\n// parseInt('12px') === 12 (dừng ở ký tự lạ) còn Number('12px') là NaN.",
+    n: "Kiểm tra NaN bằng Number.isNaN(x) — so sánh x === NaN luôn false.",
   },
 ];

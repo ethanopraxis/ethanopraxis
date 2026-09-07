@@ -1,3 +1,4 @@
+// deck v2 — 2026-09-06: +delta corpus (kiểm toán) +delta đối xứng (lint). Nội dung tác giả duyệt.
 import type { Drill } from "../../lib/nenmong/types";
 
 export const LEVELS: string[] = [
@@ -129,6 +130,7 @@ export const DECK: Drill[] = [
     id: "j-l3-init", lv: 3, t: "Khởi tạo mảng",
     p: "Hai dòng: mảng int n phần tử (mặc định 0); lấp toàn bộ mảng a bằng -1.",
     a: "int[] a = new int[n];\nArrays.fill(a, -1);",
+    n: "Cùng khuôn cho mảng thăm: boolean[] visited = new boolean[n]; (mặc định false).",
   },
   {
     id: "j-l3-matrix", lv: 3, t: "Ma trận 2D",
@@ -257,5 +259,29 @@ export const DECK: Drill[] = [
     id: "j-l5-dirs", lv: 5, t: "Duyệt 4 hướng lưới",
     p: "Từ ô (x, y): sinh 4 ô kề và lọc những ô nằm trong biên lưới m × n.",
     a: "int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};\nfor (int[] d : dirs) {\n    int nx = x + d[0], ny = y + d[1];\n    if (nx >= 0 && nx < m && ny >= 0 && ny < n) {\n        ...\n    }\n}",
+  },
+  {
+    id: "j-l2-substr", lv: 2, t: "substring",
+    p: "Hai biểu thức: chuỗi con của s từ chỉ số l đến r-1; từ l đến hết chuỗi.",
+    a: "s.substring(l, r)   // nửa mở [l, r) — r KHÔNG bao gồm\ns.substring(l)",
+    n: "Đổi qua C++ là dính: substr(pos, LEN) nhận ĐỘ DÀI, không phải chỉ số cuối.",
+  },
+  {
+    id: "j-l2-pal", lv: 2, t: "Palindrome",
+    p: "Một biểu thức boolean: s có phải palindrome không?",
+    a: "new StringBuilder(s).reverse().toString().equals(s)",
+    n: "Nhớ .equals — so sánh chuỗi bằng == là bẫy Móng.",
+  },
+  {
+    id: "j-l5-bit", lv: 5, t: "Bit cơ bản",
+    p: "Năm biểu thức: kiểm tra x lẻ; chia đôi x; 2 mũ k; tắt bit 1 thấp nhất; XOR.",
+    a: "(x & 1) == 1\nx >> 1\n1 << k\nx & (x - 1)\nx ^ y",
+    n: "x & 1 == 0 KHÔNG compile — == mạnh hơn & trong Java, thành int & boolean. Luôn đóng ngoặc. Số âm: >> giữ dấu, >>> đổ số 0.",
+  },
+  {
+    id: "j-l5-dfs", lv: 5, t: "DFS kiểu Java: field + helper",
+    p: "Java không có hàm lồng — viết khung DFS chuẩn LeetCode: trạng thái chia sẻ + method helper đệ quy.",
+    a: "private List<List<Integer>> g;\nprivate int cnt;\n\nprivate void dfs(int u) {\n    cnt++;\n    for (int v : g.get(u)) dfs(v);\n}",
+    n: "Trạng thái chung đi qua FIELD của class (hoặc tham số), không qua closure — vì vậy code Java LC hay có biến instance ở đầu class.",
   },
 ];

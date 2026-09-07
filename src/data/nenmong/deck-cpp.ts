@@ -1,3 +1,4 @@
+// deck v2 — 2026-09-06: +delta corpus (kiểm toán) +delta đối xứng (lint). Nội dung tác giả duyệt.
 import type { Drill } from "../../lib/nenmong/types";
 
 export const LEVELS: string[] = [
@@ -128,7 +129,7 @@ export const DECK: Drill[] = [
     id: "c-l3-pushpop", lv: 3, t: "Đuôi vector",
     p: "Ba thao tác: thêm x vào cuối v; đọc phần tử cuối; bỏ phần tử cuối.",
     a: "v.push_back(x);\nv.back();\nv.pop_back();",
-    n: "pop_back trả VOID — muốn lấy giá trị phải back() trước rồi mới pop_back().",
+    n: "pop_back trả VOID — muốn lấy giá trị phải back() trước rồi mới pop_back(). emplace_back(x) dựng tại chỗ — với int không khác push_back.",
   },
   {
     id: "c-l3-sort", lv: 3, t: "Sắp xếp",
@@ -240,5 +241,41 @@ export const DECK: Drill[] = [
     id: "c-l5-dirs", lv: 5, t: "Duyệt 4 hướng lưới",
     p: "Từ ô (x, y): sinh 4 ô kề và lọc những ô nằm trong biên lưới m × n.",
     a: "int dirs[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};\nfor (auto& d : dirs) {\n    int nx = x + d[0], ny = y + d[1];\n    if (nx >= 0 && nx < m && ny >= 0 && ny < n) {\n        ...\n    }\n}",
+  },
+  {
+    id: "c-l2-pal", lv: 2, t: "Palindrome",
+    p: "Một biểu thức boolean: s có phải palindrome không?",
+    a: "s == string(s.rbegin(), s.rend())",
+    n: "Dựng chuỗi đảo từ reverse iterator — hoặc equal(s.begin(), s.begin() + s.size() / 2, s.rbegin()) nếu không muốn cấp phát.",
+  },
+  {
+    id: "c-l4-freqmax", lv: 4, t: "Key có value lớn nhất",
+    p: "Lấy key có value lớn nhất trong unordered_map cnt bằng STL.",
+    a: "auto it = max_element(cnt.begin(), cnt.end(),\n    [](const auto& a, const auto& b) { return a.second < b.second; });\nchar bestK = it->first;",
+    n: "Comparator so THEO VALUE nhưng max_element trả iterator đến CẶP — lấy ->first. Vòng lặp thường cũng hợp lệ.",
+  },
+  {
+    id: "c-l4-bound", lv: 4, t: "lower_bound / upper_bound",
+    p: "Trên vector đã sắp v: chỉ số phần tử đầu tiên >= x; và bẫy khi dùng trên set là gì?",
+    a: "auto it = lower_bound(v.begin(), v.end(), x);\nint i = it - v.begin();   // đầu tiên >= x; upper_bound: đầu tiên > x\n// Đếm số lần x xuất hiện: upper_bound - lower_bound",
+    n: "Trên set/map PHẢI dùng hàm thành viên st.lower_bound(x) — bản algorithm trên iterator của set là O(n) chứ không phải O(log n).",
+  },
+  {
+    id: "c-l5-bit", lv: 5, t: "Bit cơ bản",
+    p: "Năm biểu thức: kiểm tra x lẻ; chia đôi x; 2 mũ k; tắt bit 1 thấp nhất; XOR.",
+    a: "(x & 1) == 1\nx >> 1\n1 << k          // 1LL << k khi k có thể >= 31\nx & (x - 1)\nx ^ y",
+    n: "== mạnh hơn & — x & 1 == 0 compile nhưng luôn cho kết quả sai. Dịch 1 << k quá 31 bit trên int là UB — dùng 1LL.",
+  },
+  {
+    id: "c-l5-memo", lv: 5, t: "Nhớ hoá đệ quy",
+    p: "Viết khung nhớ hoá cho f(k): vector memo khởi tạo -1 + lambda đệ quy.",
+    a: "vector<int> memo(n + 1, -1);\nfunction<int(int)> f = [&](int k) {\n    if (memo[k] != -1) return memo[k];\n    int kq = 0 /* tính */;\n    return memo[k] = kq;\n};",
+    n: "2D: vector<vector<int>> memo(m, vector<int>(n, -1)). Trả-gán return memo[k] = kq là idiom chung với Java.",
+  },
+  {
+    id: "c-l5-freq26", lv: 5, t: "Mảng đếm 26",
+    p: "Đếm tần suất chữ thường của s bằng mảng 26 phần tử — viết cách khởi tạo ĐÚNG.",
+    a: "int freq[26] = {};   // = {} bắt buộc — mảng cục bộ không khởi tạo là RÁC\nfor (char c : s) freq[c - 'a']++;",
+    n: "Hoặc vector<int> freq(26); — tự về 0. Quên = {} là bug 'thi thoảng đúng' rất khó lần.",
   },
 ];

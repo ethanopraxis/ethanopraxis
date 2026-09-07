@@ -1,3 +1,4 @@
+// deck v2 — 2026-09-06: +delta corpus (kiểm toán) +delta đối xứng (lint). Nội dung tác giả duyệt.
 import type { Drill } from "../../lib/nenmong/types";
 
 export const LEVELS: string[] = [
@@ -143,6 +144,7 @@ export const DECK: Drill[] = [
     p: "Một dòng: list bình phương của các số chẵn trong nums.",
     v: ["Một dòng: từ nums tạo list mới gồm x*x với mọi x chẵn."],
     a: "[x * x for x in nums if x % 2 == 0]",
+    n: "Bỏ [] trong lời gọi hàm là generator: sum(x * x for x in nums if x % 2 == 0) — không tạo list trung gian.",
   },
   {
     id: "l3-sortkey", lv: 3, t: "sort với key",
@@ -236,7 +238,7 @@ export const DECK: Drill[] = [
     id: "l5-divmod", lv: 5, t: "Chia nguyên · dư · trần",
     p: "Hai dòng: lấy thương nguyên q và dư r của a chia b bằng một lệnh; chia lấy trần của a cho b không import math (a, b dương).",
     a: "q, r = divmod(a, b)\ntran = (a + b - 1) // b",
-    n: "Hoặc -(-a // b). Nhớ: // của Python làm tròn về âm vô cực, khác C/Java.",
+    n: "Hoặc -(-a // b). Nhớ: // của Python làm tròn về âm vô cực, khác C/Java. Bài đếm lớn: lấy dư theo MOD = 10**9 + 7 sau MỖI phép cộng/nhân.",
   },
   {
     id: "l5-deque", lv: 5, t: "deque cho BFS",
@@ -261,5 +263,28 @@ export const DECK: Drill[] = [
     id: "l5-dirs", lv: 5, t: "Duyệt 4 hướng lưới",
     p: "Từ ô (x, y): sinh 4 ô kề và lọc những ô nằm trong biên lưới m × n.",
     a: "for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):\n    nx, ny = x + dx, y + dy\n    if 0 <= nx < m and 0 <= ny < n:\n        ...",
+  },
+  {
+    id: "l5-bit", lv: 5, t: "Bit cơ bản",
+    p: "Năm biểu thức: kiểm tra x lẻ; chia đôi x; 2 mũ k; tắt bit 1 thấp nhất của x; XOR hai số.",
+    a: "x & 1            # 1 nếu x lẻ\nx >> 1           # chia nguyên cho 2\n1 << k           # 2**k\nx & (x - 1)      # tắt bit 1 thấp nhất\nx ^ y            # XOR — tự triệt tiêu: a ^ a == 0",
+    n: "Python: & mạnh hơn == nên (x & 1) == 0 viết không ngoặc vẫn đúng — nhưng họ C thì KHÔNG, cứ đóng ngoặc cho thành phản xạ.",
+  },
+  {
+    id: "l5-dfs", lv: 5, t: "DFS lồng trong method",
+    p: "Trong một method, viết khung dfs(u) đệ quy duyệt g[u], cập nhật biến đếm cnt khai báo bên ngoài dfs.",
+    a: "cnt = 0\ndef dfs(u):\n    nonlocal cnt\n    cnt += 1\n    for v in g[u]:\n        dfs(v)\ndfs(root)",
+    n: "Chỉ ĐỌC hoặc .append thì không cần nonlocal; GÁN LẠI (cnt += 1, best = ...) mà quên nonlocal là UnboundLocalError kinh điển.",
+  },
+  {
+    id: "l5-bisect", lv: 5, t: "bisect trái / phải",
+    p: "Sau import: vị trí chèn trái của x trong mảng đã sắp a; và khi x đã có mặt thì bisect_left khác bisect_right thế nào?",
+    a: "from bisect import bisect_left, bisect_right\ni = bisect_left(a, x)    # chỉ số phần tử ĐẦU TIÊN >= x\nj = bisect_right(a, x)   # chỉ số phần tử đầu tiên > x\n# x xuất hiện j - i lần; chèn giữ thứ tự: insort(a, x)",
+  },
+  {
+    id: "l5-freq26", lv: 5, t: "Mảng đếm 26",
+    p: "Đếm tần suất chữ thường của s bằng list 26 phần tử (không dùng Counter).",
+    a: "freq = [0] * 26\nfor c in s:\n    freq[ord(c) - ord('a')] += 1",
+    n: "Nhân list 1 CHIỀU với số nguyên là an toàn — bẫy [[0]*n]*m chỉ xảy ra khi lồng nhau (xem khối Móng). Nhanh hơn Counter khi bảng chữ cái cố định.",
   },
 ];

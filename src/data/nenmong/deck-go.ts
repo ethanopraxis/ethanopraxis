@@ -1,3 +1,4 @@
+// deck v2 — 2026-09-06: +delta corpus (kiểm toán) +delta đối xứng (lint). Nội dung tác giả duyệt.
 import type { Drill } from "../../lib/nenmong/types";
 
 export const LEVELS: string[] = [
@@ -81,6 +82,7 @@ export const DECK: Drill[] = [
     id: "g-l1-bs", lv: 1, t: "Khung binary search",
     p: "Viết thân hàm binary search trên nums đã sắp xếp: trả về chỉ số của target, không có thì trả -1.",
     a: "lo, hi := 0, len(nums)-1\nfor lo <= hi {\n    mid := lo + (hi-lo)/2\n    if nums[mid] == target {\n        return mid\n    }\n    if nums[mid] < target {\n        lo = mid + 1\n    } else {\n        hi = mid - 1\n    }\n}\nreturn -1",
+    n: "Chuẩn thư viện: sort.Search(n, func(i int) bool) trả chỉ số ĐẦU TIÊN làm hàm true — xuất hiện đều trong lời giải Go thật.",
   },
 
   // ===== Nền 2 — Chuỗi =====
@@ -250,5 +252,40 @@ export const DECK: Drill[] = [
     id: "g-l5-dirs", lv: 5, t: "Duyệt 4 hướng lưới",
     p: "Từ ô (x, y): sinh 4 ô kề và lọc những ô nằm trong biên lưới m × n.",
     a: "dirs := [4][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}\nfor _, d := range dirs {\n    nx, ny := x+d[0], y+d[1]\n    if nx >= 0 && nx < m && ny >= 0 && ny < n {\n        ...\n    }\n}",
+  },
+  {
+    id: "g-l2-substr", lv: 2, t: "Cắt chuỗi con",
+    p: "Lấy 'chuỗi con' của s từ l đến r-1 — và bẫy với tiếng Việt?",
+    a: "s[l:r]   // cắt theo BYTE, nửa mở [l, r)\n// Chuỗi có dấu: cắt giữa rune sẽ vỡ ký tự —\n// an toàn Unicode: string([]rune(s)[l:r])",
+  },
+  {
+    id: "g-l2-pal", lv: 2, t: "Palindrome",
+    p: "Kiểm tra s là palindrome bằng two-pointer trên rune (Go không có đảo-rồi-so một dòng).",
+    a: "r := []rune(s)\nfor i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {\n    if r[i] != r[j] {\n        return false\n    }\n}\nreturn true",
+    n: "Two-pointer thoát sớm còn nhanh hơn đảo chuỗi đầy đủ — dùng lại được cho valid-palindrome có bỏ ký tự.",
+  },
+  {
+    id: "g-l4-freqmax", lv: 4, t: "Key có value lớn nhất",
+    p: "Tìm key có value lớn nhất trong map cnt (Go không có most_common).",
+    a: "bestK, bestV := byte(0), -1\nfor k, v := range cnt {\n    if v > bestV {\n        bestK, bestV = k, v\n    }\n}",
+    n: "Thứ tự duyệt map NGẪU NHIÊN — khi hoà, kết quả có thể đổi giữa các lần chạy; cần tất định thì thêm tie-break rõ ràng.",
+  },
+  {
+    id: "g-l5-bit", lv: 5, t: "Bit cơ bản",
+    p: "Năm biểu thức: kiểm tra x lẻ; chia đôi x; 2 mũ k; tắt bit 1 thấp nhất; XOR.",
+    a: "x & 1\nx >> 1\n1 << k\nx & (x - 1)\nx ^ y   // Go còn có x &^ y (AND NOT — xoá các bit của y khỏi x)",
+    n: "Go xếp & mạnh hơn == nên (x&1) == 0 không ngoặc vẫn đúng — là NGOẠI LỆ trong họ C; đổi ngôn ngữ là dính bẫy ưu tiên.",
+  },
+  {
+    id: "g-l5-memo", lv: 5, t: "Nhớ hoá đệ quy",
+    p: "Viết khung nhớ hoá cho f(k): slice memo khởi tạo -1, kết hợp closure đệ quy.",
+    a: "memo := make([]int, n+1)\nfor i := range memo {\n    memo[i] = -1\n}\nvar f func(k int) int\nf = func(k int) int {\n    if memo[k] != -1 {\n        return memo[k]\n    }\n    kq := 0 /* tính */\n    memo[k] = kq\n    return kq\n}",
+    n: "Key nhiều chiều: map[[2]int]int hoặc struct key (xem khối key tổng hợp). Go không có decorator kiểu @cache.",
+  },
+  {
+    id: "g-l5-freq26", lv: 5, t: "Mảng đếm 26",
+    p: "Đếm tần suất chữ thường (ASCII) của s bằng mảng 26 phần tử.",
+    a: "var freq [26]int\nfor i := 0; i < len(s); i++ {\n    freq[s[i]-'a']++\n}",
+    n: "[26]int là MẢNG — kiểu giá trị: truyền vào hàm là BẢN SAO (khác slice). Cần chia sẻ thì truyền *[26]int hoặc dùng slice.",
   },
 ];

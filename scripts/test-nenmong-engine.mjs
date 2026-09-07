@@ -17,7 +17,7 @@ import path from "node:path";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = fs.mkdtempSync(path.join(os.tmpdir(), "nenmong-test-"));
 
-process.stdout.write("compiling engine + decks… ");
+process.stdout.write("compiling engine + decks + concepts… ");
 try {
   execFileSync(
   process.execPath,
@@ -25,6 +25,7 @@ try {
     path.join(ROOT, "node_modules/typescript/lib/tsc.js"),
     path.join(ROOT, "src/lib/nenmong/engine.ts"),
     path.join(ROOT, "src/data/nenmong/index.ts"),
+    path.join(ROOT, "src/data/nenmong/concepts.ts"),
     "--outDir", OUT,
     "--rootDir", path.join(ROOT, "src"),
     "--module", "commonjs",
@@ -51,6 +52,7 @@ console.log("ok");
 const req = createRequire(path.join(OUT, "package.json"));
 const E = req(path.join(OUT, "lib/nenmong/engine.js"));
 const { LANGS } = req(path.join(OUT, "data/nenmong/index.js"));
+const { CONCEPTS } = req(path.join(OUT, "data/nenmong/concepts.js"));
 
 const TODAY = "2026-03-01";
 const input = (code = "", id = "x", secs = 7) => ({ id, code, secs });
@@ -186,7 +188,7 @@ check("bumpStreak: same day no-op, consecutive increments, gap resets", () => {
 });
 
 /* 9 — deck lint across all five decks */
-const EXPECTED = { py: 42, java: 42, go: 40, cpp: 39, ts: 39 };
+const EXPECTED = { py: 46, java: 46, go: 46, cpp: 45, ts: 47 };
 check("deck lint: sizes, unique ids, lv range, non-empty t/p/a", () => {
   let total = 0;
   assert.equal(LANGS.length, 5);
@@ -206,8 +208,59 @@ check("deck lint: sizes, unique ids, lv range, non-empty t/p/a", () => {
       }
     }
   }
-  assert.equal(total, 202, `expected 202 blocks across all decks, got ${total}`);
+  assert.equal(total, 230, `expected 230 blocks across all decks, got ${total}`);
 });
+
+/* ── symmetry lint (phase E §4) ────────────────────────────────────────────
+   Adapted from the provided lint-symmetry.mjs. Semantics are kept exactly;
+   only the module loading changes — the reference imported from ./dist, this
+   uses the temp-dir CommonJS build the rest of this file already relies on. */
+
+console.log("\n" + LANGS.map((l) => `${l.id}:${l.deck.length}`).join("  ") + `  — TỔNG ${LANGS.reduce((n, l) => n + l.deck.length, 0)}`);
+
+const IDS = Object.fromEntries(LANGS.map((l) => [l.id, new Set(l.deck.map((d) => d.id))]));
+const claimed = Object.fromEntries(LANGS.map((l) => [l.id, new Set()]));
+
+/* §4.2 — every row covers all five languages; every drill cell names a real
+   id; a valid drill cell marks that id as entered in the ledger. */
+check("concepts: every row covers 5 languages and points at real drills", () => {
+  const problems = [];
+  for (const row of CONCEPTS) {
+    const langs = Object.keys(row.cells);
+    if (langs.length !== 5) problems.push(`${row.concept}: ${langs.length}/5 ngôn ngữ`);
+    for (const [lang, cell] of Object.entries(row.cells)) {
+      if (!("drill" in cell)) continue;
+      if (!IDS[lang]?.has(cell.drill)) problems.push(`${row.concept}.${lang} → id không tồn tại: ${cell.drill}`);
+      else claimed[lang].add(cell.drill);
+    }
+  }
+  assert.deepEqual(problems, [], "\n       " + problems.join("\n       "));
+});
+
+/* §4.3 — auto-group every drill by id suffix; python ids carry no prefix. */
+const strip = (lang, id) => (lang === "py" ? id : id.replace(/^[jgct]-/, ""));
+const groups = new Map();
+for (const l of LANGS) {
+  for (const d of l.deck) {
+    const s = strip(l.id, d.id);
+    if (!groups.has(s)) groups.set(s, new Map());
+    groups.get(s).set(l.id, d.id);
+  }
+}
+
+let warn = 0;
+check("symmetry: no unexplained asymmetry (1 < k < 5 must be fully in the ledger)", () => {
+  const failures = [];
+  for (const [suffix, m] of groups) {
+    const k = m.size;
+    if (k === 5) continue;
+    const allClaimed = [...m.entries()].every(([lang, id]) => claimed[lang].has(id));
+    if (k === 1) { if (!allClaimed) warn++; continue; }
+    if (!allClaimed) failures.push(`'${suffix}' ở [${[...m.keys()].join(", ")}]`);
+  }
+  assert.deepEqual(failures, [], "BẤT ĐỐI XỨNG chưa giải thích:\n       " + failures.join("\n       "));
+});
+console.log(`đối xứng: ${process.exitCode ? "có" : "0"} FAIL · ${warn} khối đơn nhất chưa vào sổ (WARN)`);
 
 fs.rmSync(OUT, { recursive: true, force: true });
 console.log(`\n${passed} check(s) passed` + (process.exitCode ? " — WITH FAILURES" : ""));
