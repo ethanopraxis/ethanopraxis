@@ -1,0 +1,45 @@
+---
+/**
+ * Minimal layout for /nen-mong only.
+ *
+ * The site's Base.astro renders the masthead, nav, search island and footer,
+ * which would collide with the tool's own header/footer and put site chrome on
+ * an unlisted page. §7.6 sanctions a dedicated layout in exactly this case, and
+ * it keeps Base.astro untouched (KỴ 2).
+ *
+ * Fonts are imported here rather than globally so nothing reaches a Phase-1
+ * page: Lora is already a site dependency; Be Vietnam Pro (the reference's body
+ * face) is static-weight, so the three weights the tool uses are imported.
+ */
+import '@fontsource-variable/lora';
+import '@fontsource/be-vietnam-pro/400.css';
+import '@fontsource/be-vietnam-pro/500.css';
+import '@fontsource/be-vietnam-pro/600.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#F2EADA" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* Page-local reset. This layout is used by /nen-mong alone, so it cannot
+     reach any other page; the tool's own CSS stays fully scoped to .nm-root. */
+  html, body { margin: 0; padding: 0; background: #F2EADA; }
+</style>

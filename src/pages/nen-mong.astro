@@ -1,0 +1,10 @@
+---
+import NenMong from '../components/nenmong/NenMong.tsx';
+import Layout from '../layouts/NenMong.astro';
+---
+<Layout
+  title="Nền Móng — luyện khối nhỏ"
+  description="Luyện khối nhỏ mỗi ngày: viết lại từ trí nhớ, tự chấm, nghiệm thu theo lịch. Bạn xây. Công cụ chỉ nghiệm thu."
+>
+  <NenMong client:only="react" />
+</Layout>

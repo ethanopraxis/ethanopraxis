@@ -1,0 +1,153 @@
+/*
+ * Nền Móng — styles extracted from docs/reference/nen-mong-v0.jsx (§7.5).
+ * Mechanical transform only: the Google Fonts @import is deleted (fonts come
+ * from the page), every class carries the nm- prefix, the reference's :root
+ * variables moved onto .nm-root as --nm-*, and every selector is nested under
+ * .nm-root so nothing can reach a Phase-1 page (KỴ 3).
+ *
+ * The palette keeps the REFERENCE's values, not the site tokens': they differ
+ * (site --paper-warm #FBF6EA vs reference --paper-hi #F8F2E3, etc.) and §1
+ * requires identical visual identity.
+ */
+
+.nm-root {
+  --nm-paper: #F2EADA;
+  --nm-paper-hi: #F8F2E3;
+  --nm-paper-lo: #EAE0C9;
+  --nm-ink: #2A241C;
+  --nm-ink-soft: #6F6453;
+  --nm-line: #D6C9AC;
+  --nm-son: #B13125;
+
+  min-height: 100vh;
+  background: var(--nm-paper);
+  color: var(--nm-ink);
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+.nm-root * { box-sizing: border-box; }
+
+.nm-root .nm-loading { padding: 60px 0; text-align: center; color: var(--nm-ink-soft); font-style: italic; }
+
+.nm-root .nm-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--nm-ink); }
+.nm-root .nm-brand { display: flex; align-items: center; gap: 12px; }
+.nm-root .nm-brandTitle { font-family: 'Lora Variable', Lora, Georgia, serif; font-weight: 700; font-size: 24px; letter-spacing: .01em; line-height: 1.1; }
+.nm-root .nm-brandSub { font-size: 12px; color: var(--nm-ink-soft); letter-spacing: .14em; text-transform: uppercase; margin-top: 2px; }
+.nm-root .nm-headRight { text-align: right; }
+.nm-root .nm-date { font-size: 13px; color: var(--nm-ink-soft); }
+.nm-root .nm-streak { font-family: 'Lora Variable', Lora, Georgia, serif; font-size: 14px; margin-top: 2px; }
+
+/* Language selector — the one sanctioned addition (§5), built from the
+   existing tag/pill look so it introduces no new visual language. */
+.nm-root .nm-lang {
+  margin-top: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--nm-ink);
+  background: var(--nm-paper-hi);
+  border: 1px solid var(--nm-ink);
+  border-radius: 2px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.nm-root .nm-lang:focus-visible { outline: 2px solid var(--nm-son); outline-offset: 2px; }
+
+.nm-root .nm-warn { margin-top: 10px; padding: 8px 12px; border: 1px solid var(--nm-son); color: var(--nm-son); font-size: 13px; background: var(--nm-paper-hi); }
+
+.nm-root .nm-tabs { display: flex; gap: 2px; margin: 16px 0 18px; border: 1px solid var(--nm-line); background: var(--nm-paper-lo); padding: 3px; border-radius: 3px; }
+.nm-root .nm-tab { flex: 1; position: relative; padding: 8px 4px; background: transparent; border: none; cursor: pointer;
+  font-family: inherit; font-size: 13px; letter-spacing: .06em; color: var(--nm-ink-soft); border-radius: 2px; }
+.nm-root .nm-tabOn { background: var(--nm-paper-hi); color: var(--nm-ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--nm-line); }
+.nm-root .nm-dot { position: absolute; top: 7px; right: 10px; width: 7px; height: 7px; border-radius: 50%; background: var(--nm-son); }
+
+.nm-root .nm-stats { display: flex; gap: 10px; margin-bottom: 16px; }
+.nm-root .nm-stat { flex: 1; border: 1px solid var(--nm-line); background: var(--nm-paper-hi); padding: 10px 12px; border-radius: 2px; }
+.nm-root .nm-statN { font-family: 'Lora Variable', Lora, Georgia, serif; font-size: 26px; font-weight: 600; line-height: 1; }
+.nm-root .nm-statL { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--nm-ink-soft); margin-top: 4px; }
+.nm-root .nm-statSon .nm-statN { color: var(--nm-son); }
+
+.nm-root .nm-lockline { font-size: 13px; color: var(--nm-ink-soft); margin: 0 0 10px; font-style: italic; }
+.nm-root .nm-lockline .nm-btn.nm-linky { font-style: normal; }
+
+.nm-root .nm-sheet { border: 1px solid var(--nm-ink); background: var(--nm-paper-hi); padding: 18px 18px 20px; border-radius: 2px; margin-bottom: 18px;
+  box-shadow: 3px 3px 0 rgba(42, 36, 28, .08); }
+.nm-root .nm-sheet.nm-intro { border-color: var(--nm-line); }
+.nm-root .nm-sheet.nm-done { text-align: center; padding-top: 28px; }
+.nm-root .nm-sheet.nm-detail { margin-top: 16px; }
+.nm-root .nm-sheetHead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.nm-root .nm-tag { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; border: 1px solid var(--nm-ink); padding: 3px 8px; border-radius: 2px; }
+.nm-root .nm-tagSon { border-color: var(--nm-son); color: var(--nm-son); }
+.nm-root .nm-lvl { font-size: 12px; color: var(--nm-ink-soft); }
+.nm-root .nm-timer { margin-left: auto; font-size: 12px; color: var(--nm-ink-soft); font-variant-numeric: tabular-nums; }
+
+.nm-root .nm-dtitle { font-family: 'Lora Variable', Lora, Georgia, serif; font-size: 21px; font-weight: 600; margin: 0 0 8px; line-height: 1.25; }
+.nm-root .nm-dprompt { margin: 0 0 12px; white-space: pre-wrap; }
+.nm-root .nm-metaLine { font-size: 13px; color: var(--nm-ink-soft); margin: 0 0 12px; }
+
+.nm-root .nm-code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; line-height: 1.5;
+  white-space: pre-wrap; word-break: break-word; padding: 12px 14px; border-radius: 2px; margin: 0 0 12px; }
+.nm-root .nm-code.nm-promptcode { background: var(--nm-paper); border: 1px dashed var(--nm-line); }
+.nm-root .nm-code.nm-answer { background: var(--nm-paper); border: 1px solid var(--nm-ink); }
+.nm-root .nm-code.nm-old { background: var(--nm-paper-lo); border: 1px solid var(--nm-line); color: var(--nm-ink-soft); }
+
+.nm-root .nm-editor { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; line-height: 1.55;
+  background: #FFFDF6; color: var(--nm-ink); border: 1px solid var(--nm-ink); border-radius: 2px; padding: 12px 14px; resize: vertical; margin-bottom: 12px; }
+.nm-root .nm-editor:focus { outline: 2px solid var(--nm-ink); outline-offset: 1px; }
+.nm-root .nm-editor:disabled { background: var(--nm-paper); color: var(--nm-ink-soft); }
+.nm-root .nm-editor::placeholder { color: var(--nm-ink-soft); font-style: italic; }
+
+.nm-root .nm-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.nm-root .nm-btn { font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--nm-ink); background: var(--nm-paper-hi); color: var(--nm-ink); padding: 9px 16px; border-radius: 2px; }
+.nm-root .nm-btn:hover { background: var(--nm-paper-lo); }
+.nm-root .nm-btn.nm-primary { background: var(--nm-ink); color: var(--nm-paper-hi); }
+.nm-root .nm-btn.nm-primary:hover { background: #3a332a; }
+.nm-root .nm-btn.nm-son { background: var(--nm-son); border-color: var(--nm-son); color: var(--nm-paper-hi); }
+.nm-root .nm-btn.nm-sonline { border-color: var(--nm-son); color: var(--nm-son); background: transparent; }
+.nm-root .nm-btn.nm-sonline:hover { background: rgba(177, 49, 37, .07); }
+.nm-root .nm-btn.nm-linky { border: none; background: none; padding: 2px 4px; text-decoration: underline; color: var(--nm-ink-soft); font-size: 13px; }
+.nm-root .nm-btn:focus-visible { outline: 2px solid var(--nm-son); outline-offset: 2px; }
+
+.nm-root .nm-reveal { border-top: 1px dashed var(--nm-line); padding-top: 14px; margin-top: 2px; }
+.nm-root .nm-anslabel { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--nm-ink-soft); margin-bottom: 6px; }
+.nm-root .nm-note { font-size: 13px; color: var(--nm-ink-soft); margin: 0 0 12px; }
+.nm-root .nm-gradehint { font-size: 12.5px; color: var(--nm-ink-soft); font-style: italic; margin: 0 0 10px; }
+.nm-root .nm-prevmiss { margin-top: 4px; }
+
+.nm-root .nm-mapRow { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--nm-line); }
+.nm-root .nm-mapLabel { width: 150px; flex-shrink: 0; font-size: 13px; color: var(--nm-ink-soft); padding-top: 3px; }
+.nm-root .nm-mapSquares { display: flex; flex-wrap: wrap; gap: 7px; }
+.nm-root .nm-sq { width: 24px; height: 24px; border-radius: 2px; cursor: pointer; padding: 0; }
+.nm-root .nm-sqU { background: transparent; border: 1.5px dashed var(--nm-ink-soft); }
+.nm-root .nm-sqB { background: var(--nm-ink); border: 1.5px solid var(--nm-ink); }
+.nm-root .nm-sqS { background: var(--nm-son); border: 1.5px solid var(--nm-son); }
+.nm-root .nm-sqCr { background: transparent; border: 1.5px dashed var(--nm-son); }
+.nm-root .nm-sqSel { outline: 2px solid var(--nm-ink); outline-offset: 2px; }
+.nm-root .nm-sq.nm-demo { display: inline-block; width: 13px; height: 13px; cursor: default; vertical-align: -2px; margin-right: 5px; }
+.nm-root .nm-legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12.5px; color: var(--nm-ink-soft); padding: 12px 0; }
+
+.nm-root .nm-logEntry .nm-code { margin-bottom: 8px; }
+.nm-root .nm-ansdetails summary { font-size: 13px; color: var(--nm-ink-soft); cursor: pointer; margin-bottom: 8px; }
+.nm-root .nm-wipeRow { padding: 18px 0 0; text-align: center; }
+
+.nm-root .nm-foot { margin-top: 34px; padding-top: 14px; border-top: 1px solid var(--nm-line); text-align: center; font-size: 12px; color: var(--nm-ink-soft); font-style: italic; }
+
+.nm-root .nm-stampwrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 50; }
+.nm-root .nm-stampin { animation: nm-stamp .5s cubic-bezier(.2, .9, .3, 1.2) both; filter: drop-shadow(0 4px 14px rgba(42, 36, 28, .35)); }
+@keyframes nm-stamp {
+  0% { transform: scale(2.1) rotate(9deg); opacity: 0; }
+  55% { transform: scale(.94) rotate(-4deg); opacity: 1; }
+  78% { transform: scale(1.05) rotate(-4deg); }
+  100% { transform: scale(1) rotate(-4deg); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .nm-root .nm-stampin { animation: none; } }
+@media (max-width: 480px) {
+  .nm-root .nm-mapLabel { width: 104px; font-size: 12px; }
+  .nm-root .nm-brandTitle { font-size: 21px; }
+}
