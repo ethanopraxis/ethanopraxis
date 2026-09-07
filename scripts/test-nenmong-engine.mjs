@@ -17,7 +17,7 @@ import path from "node:path";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const OUT = fs.mkdtempSync(path.join(os.tmpdir(), "nenmong-test-"));
 
-process.stdout.write("compiling engine + decks + concepts… ");
+process.stdout.write("compiling engine + decks + concepts + grader… ");
 try {
   execFileSync(
   process.execPath,
@@ -26,6 +26,7 @@ try {
     path.join(ROOT, "src/lib/nenmong/engine.ts"),
     path.join(ROOT, "src/data/nenmong/index.ts"),
     path.join(ROOT, "src/data/nenmong/concepts.ts"),
+    path.join(ROOT, "src/lib/nenmong/sqlgrader.ts"),
     "--outDir", OUT,
     "--rootDir", path.join(ROOT, "src"),
     "--module", "commonjs",
@@ -47,12 +48,17 @@ try {
 }
 // /tmp has no package.json, but be explicit so "type": "module" never leaks in.
 fs.writeFileSync(path.join(OUT, "package.json"), JSON.stringify({ type: "commonjs" }));
+// The compiled grader requires "sql.js" by bare specifier; the temp dir needs a
+// node_modules to resolve it from.
+try { fs.symlinkSync(path.join(ROOT, "node_modules"), path.join(OUT, "node_modules"), "dir"); } catch { /* exists */ }
 console.log("ok");
 
 const req = createRequire(path.join(OUT, "package.json"));
 const E = req(path.join(OUT, "lib/nenmong/engine.js"));
 const { LANGS } = req(path.join(OUT, "data/nenmong/index.js"));
 const { CONCEPTS } = req(path.join(OUT, "data/nenmong/concepts.js"));
+const GRADER = req(path.join(OUT, "lib/nenmong/sqlgrader.js"));
+const { SETUPS } = req(path.join(OUT, "data/nenmong/deck-sql.js"));
 
 const TODAY = "2026-03-01";
 const input = (code = "", id = "x", secs = 7) => ({ id, code, secs });
@@ -188,10 +194,10 @@ check("bumpStreak: same day no-op, consecutive increments, gap resets", () => {
 });
 
 /* 9 — deck lint across all five decks */
-const EXPECTED = { py: 46, java: 46, go: 46, cpp: 45, ts: 47 };
+const EXPECTED = { py: 46, java: 46, go: 46, cpp: 45, ts: 47, sql: 37 };
 check("deck lint: sizes, unique ids, lv range, non-empty t/p/a", () => {
   let total = 0;
-  assert.equal(LANGS.length, 5);
+  assert.equal(LANGS.length, 6);
   for (const lang of LANGS) {
     const { id, deck, levels } = lang;
     assert.equal(deck.length, EXPECTED[id], `${id}: expected ${EXPECTED[id]} blocks, got ${deck.length}`);
@@ -208,7 +214,7 @@ check("deck lint: sizes, unique ids, lv range, non-empty t/p/a", () => {
       }
     }
   }
-  assert.equal(total, 230, `expected 230 blocks across all decks, got ${total}`);
+  assert.equal(total, 267, `expected 267 blocks across all decks, got ${total}`);
 });
 
 /* ── symmetry lint (phase E §4) ────────────────────────────────────────────
@@ -218,8 +224,13 @@ check("deck lint: sizes, unique ids, lv range, non-empty t/p/a", () => {
 
 console.log("\n" + LANGS.map((l) => `${l.id}:${l.deck.length}`).join("  ") + `  — TỔNG ${LANGS.reduce((n, l) => n + l.deck.length, 0)}`);
 
-const IDS = Object.fromEntries(LANGS.map((l) => [l.id, new Set(l.deck.map((d) => d.id))]));
-const claimed = Object.fromEntries(LANGS.map((l) => [l.id, new Set()]));
+/* Symmetry is a property of the five DSA decks, which teach the same concepts
+   in five languages. SQL is its own subject with no counterpart deck, so it is
+   excluded from the auto-group and gets structural linting only (§5.1). */
+const SYMMETRY = ["py", "java", "go", "cpp", "ts"];
+const DSA = LANGS.filter((l) => SYMMETRY.includes(l.id));
+const IDS = Object.fromEntries(DSA.map((l) => [l.id, new Set(l.deck.map((d) => d.id))]));
+const claimed = Object.fromEntries(DSA.map((l) => [l.id, new Set()]));
 
 /* §4.2 — every row covers all five languages; every drill cell names a real
    id; a valid drill cell marks that id as entered in the ledger. */
@@ -240,7 +251,7 @@ check("concepts: every row covers 5 languages and points at real drills", () => 
 /* §4.3 — auto-group every drill by id suffix; python ids carry no prefix. */
 const strip = (lang, id) => (lang === "py" ? id : id.replace(/^[jgct]-/, ""));
 const groups = new Map();
-for (const l of LANGS) {
+for (const l of DSA) {
   for (const d of l.deck) {
     const s = strip(l.id, d.id);
     if (!groups.has(s)) groups.set(s, new Map());
@@ -261,6 +272,85 @@ check("symmetry: no unexplained asymmetry (1 < k < 5 must be fully in the ledger
   assert.deepEqual(failures, [], "BẤT ĐỐI XỨNG chưa giải thích:\n       " + failures.join("\n       "));
 });
 console.log(`đối xứng: ${process.exitCode ? "có" : "0"} FAIL · ${warn} khối đơn nhất chưa vào sổ (WARN)`);
+
+const compareStatus = (a, b, ordered) => GRADER.compareResults(a, b, ordered).status;
+
+/* ── SQL track (phase F §5.2, §5.3) ───────────────────────────────────────── */
+
+const checkAsync = async (name, fn) => {
+  try {
+    await fn();
+    passed++;
+    console.log("  ok   " + name);
+  } catch (err) {
+    console.error("  FAIL " + name + "\n       " + err.message);
+    process.exitCode = 1;
+  }
+};
+
+const sqlDeck = LANGS.find((l) => l.id === "sql").deck;
+const rs = (columns, values) => ({ columns, values });
+
+/* §5.2 — every canonical answer must actually run against its setup. A broken
+   canonical throws (§3.7), which is exactly what this catches. */
+await checkAsync("SQL: every drill.sql canonical answer runs on its setup", async () => {
+  const runnable = sqlDeck.filter((d) => d.sql);
+  assert.equal(runnable.length, 31, `expected 31 executable drills, got ${runnable.length}`);
+  for (const d of runnable) {
+    assert.ok(SETUPS[d.sql.setup], `${d.id}: unknown setup "${d.sql.setup}"`);
+    const res = await GRADER.runOnFreshDb(d.sql.setup, d.a);
+    const rows = res ? res.values.length : 0;
+    assert.ok(rows >= 0, `${d.id}: negative row count`);
+  }
+});
+
+/* The pair is a test OF THE COMPARISON: two different formulations of the same
+   question must agree as multisets. */
+await checkAsync("SQL: q-l4-corr and q-l4-cte agree as multisets", async () => {
+  const corr = sqlDeck.find((d) => d.id === "q-l4-corr");
+  const cte = sqlDeck.find((d) => d.id === "q-l4-cte");
+  assert.ok(corr && cte, "the corr/CTE pair is missing from the deck");
+  const a = await GRADER.runOnFreshDb(corr.sql.setup, corr.a);
+  const b = await GRADER.runOnFreshDb(cte.sql.setup, cte.a);
+  const v = GRADER.compareResults(a, b, false);
+  assert.equal(v.status, "match", `expected a match, got ${JSON.stringify(v)}`);
+});
+
+/* An `ordered` drill must really be order-sensitive end to end. */
+await checkAsync("SQL: an ordered drill rejects the same rows reversed", async () => {
+  const d = sqlDeck.find((x) => x.sql && x.sql.ordered === true);
+  assert.ok(d, "no ordered drill in the deck");
+  const expected = await GRADER.runOnFreshDb(d.sql.setup, d.a);
+  const reversed = { columns: expected.columns, values: [...expected.values].reverse() };
+  assert.equal(GRADER.compareResults(expected, reversed, true).status, "diff");
+  assert.equal(GRADER.compareResults(expected, reversed, false).status, "match");
+});
+
+/* §5.3 — the comparison rules, pinned. */
+check("compare: row order is irrelevant when ordered=false", () => {
+  const a = rs(["ten", "luong"], [["An", 3000], ["Binh", 2500]]);
+  const b = rs(["ten", "luong"], [["Binh", 2500], ["An", 3000]]);
+  assert.equal(compareStatus(a, b, false), "match");
+  assert.equal(compareStatus(a, b, true), "diff");
+});
+check("compare: column aliases are ignored, column COUNT is not", () => {
+  assert.equal(compareStatus(rs(["ten"], [["An"]]), rs(["name"], [["An"]]), false), "match");
+  assert.equal(compareStatus(rs(["a", "b"], [[1, 2]]), rs(["a"], [[1]]), false), "diff");
+});
+check("compare: numbers match within 1e-6, differ beyond it", () => {
+  assert.equal(compareStatus(rs(["v"], [[2500]]), rs(["v"], [[2500.0]]), false), "match");
+  assert.equal(compareStatus(rs(["v"], [[2666.6666666666665]]), rs(["v"], [[2666.666666666667]]), false), "match");
+  assert.equal(compareStatus(rs(["v"], [[2666.666666]]), rs(["v"], [[2667]]), false), "diff");
+});
+check("compare: null is neither 0 nor the empty string", () => {
+  assert.equal(compareStatus(rs(["v"], [[null]]), rs(["v"], [[0]]), false), "diff");
+  assert.equal(compareStatus(rs(["v"], [[null]]), rs(["v"], [[""]]), false), "diff");
+  assert.equal(compareStatus(rs(["v"], [[null]]), rs(["v"], [[null]]), false), "match");
+});
+check("compare: an empty result set matches another empty one", () => {
+  assert.equal(compareStatus(null, null, false), "match");
+  assert.equal(compareStatus(rs(["v"], [[1]]), null, false), "diff");
+});
 
 fs.rmSync(OUT, { recursive: true, force: true });
 console.log(`\n${passed} check(s) passed` + (process.exitCode ? " — WITH FAILURES" : ""));

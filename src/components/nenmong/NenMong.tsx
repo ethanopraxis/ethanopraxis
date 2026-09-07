@@ -20,7 +20,27 @@ import {
   type NodeState,
 } from "../../lib/nenmong/engine";
 import { clearState, loadLang, loadState, saveLang, saveState } from "../../lib/nenmong/storage";
+import type { Verdict } from "../../lib/nenmong/sqlgrader";
 import "./nen-mong.css";
+
+/**
+ * The grader and its wasm are fetched only here, and only for a track whose
+ * LangDef declares grader === "sqlite" (§7 KỴ 2). The `?url` import lives in
+ * this file rather than in sqlgrader.ts so that module still compiles under
+ * plain tsc for the node tests.
+ */
+let graderPromise: Promise<typeof import("../../lib/nenmong/sqlgrader")> | null = null;
+function loadGrader() {
+  graderPromise ??= (async () => {
+    const [mod, wasm] = await Promise.all([
+      import("../../lib/nenmong/sqlgrader"),
+      import("sql.js/dist/sql-wasm.wasm?url"),
+    ]);
+    mod.setWasmUrl(wasm.default);
+    return mod;
+  })();
+  return graderPromise;
+}
 
 type Mode = "gate" | "survey" | "build";
 type Tab = "home" | "map" | "log";
@@ -52,7 +72,7 @@ function CodeBlock({ code, tone }: { code: string; tone?: string }) {
 
 /* ---------- drill card ---------- */
 function Card({
-  item, node, mode, onGrade, gateNo, levels,
+  item, node, mode, onGrade, gateNo, levels, hasGrader,
 }: {
   item: Drill;
   node: NodeState;
@@ -60,12 +80,32 @@ function Card({
   onGrade: (g: Grade, code: string, secs: number) => void;
   gateNo?: number;
   levels: string[];
+  hasGrader?: boolean;
 }) {
   const [code, setCode] = useState("");
   const [revealed, setRevealed] = useState(false);
   const [surrendered, setSurrendered] = useState(false);
   const [secs, setSecs] = useState(0);
   const startRef = useRef(Date.now());
+  // Evidence only. Nothing here touches the grade buttons (§7 KỴ 1).
+  const graded = !!hasGrader && !!item.sql;
+  const [verdict, setVerdict] = useState<Verdict | null>(null);
+
+  useEffect(() => {
+    if (!revealed || !graded) return;
+    let alive = true;
+    setVerdict(null);
+    loadGrader()
+      .then((m) => m.checkSql(item, code))
+      .then((v) => { if (alive) setVerdict(v); })
+      .catch((e) => {
+        if (alive) setVerdict({ status: "error", message: e instanceof Error ? e.message : String(e) });
+      });
+    return () => { alive = false; };
+    // `code` is intentionally read at reveal time, not tracked: the editor is
+    // disabled once revealed, so it cannot change underneath the check.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revealed, graded, item]);
 
   useEffect(() => {
     if (revealed) return;
@@ -135,6 +175,17 @@ function Card({
 
       {revealed && (
         <div className="nm-reveal">
+          {graded && (
+            <p className="nm-note" aria-live="polite">
+              {verdict === null
+                ? "đang chạy…"
+                : verdict.status === "match"
+                  ? `✅ Kết quả khớp (${verdict.rows} dòng)`
+                  : verdict.status === "diff"
+                    ? `❌ Kết quả khác — chuẩn ${verdict.expectedRows} dòng, của bạn ${verdict.gotRows} dòng; lệch đầu tiên: ${verdict.hint}`
+                    : `⚠ Lỗi SQL: ${verdict.message}`}
+            </p>
+          )}
           <div className="nm-anslabel">Đáp án idiomatic</div>
           <CodeBlock code={item.a} tone="nm-answer" />
           {item.n && <p className="nm-note">{item.n}</p>}
@@ -256,6 +307,11 @@ export default function NenMong() {
     if (buildOverride && st.nodes[buildOverride] && st.nodes[buildOverride].st === "u") return DECK_BY_ID[buildOverride];
     return unbuilt[0] || null;
   }, [st, unbuilt, buildOverride, DECK_BY_ID]);
+
+  // Warm the grader when a grader track is selected, without blocking the UI.
+  useEffect(() => {
+    if (langDef.grader === "sqlite") void loadGrader().then((m) => m.prewarm()).catch(() => {});
+  }, [langDef]);
 
   const switchLang = (next: LangId) => {
     if (next === lang) return;
@@ -381,6 +437,7 @@ export default function NenMong() {
                 mode="gate"
                 gateNo={st.nodes[gateItem.id].iv + 1}
                 levels={LEVELS}
+                hasGrader={langDef.grader === "sqlite"}
                 onGrade={(g, c, s) => gradeGate(gateItem.id, g, c, s)}
               />
             </div>
@@ -399,6 +456,7 @@ export default function NenMong() {
                 node={st.nodes[surveyList[0].id]}
                 mode="survey"
                 levels={LEVELS}
+                hasGrader={langDef.grader === "sqlite"}
                 onGrade={(g, c, s) => gradeSurvey(surveyList[0]!.id, g, c, s)}
               />
             </div>
@@ -441,6 +499,7 @@ export default function NenMong() {
                     node={st.nodes[buildTarget.id]}
                     mode="build"
                     levels={LEVELS}
+                    hasGrader={langDef.grader === "sqlite"}
                     onGrade={(g, c, s) => gradeBuild(buildTarget.id, g, c, s)}
                   />
                 </div>

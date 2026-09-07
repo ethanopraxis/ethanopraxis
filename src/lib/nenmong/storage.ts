@@ -8,12 +8,15 @@
  * Merge-on-load and the daily buildsToday reset stay in the component, exactly
  * where the reference does them, because they need the current language's deck.
  */
-import { DEFAULT_LANG, type LangId } from "../../data/nenmong/index";
+import { DEFAULT_LANG, LANGS, type LangId } from "../../data/nenmong/index";
 import type { AppState } from "./engine";
 
 const keyFor = (lang: LangId) => `nenmong-v1:${lang}`;
 const LANG_KEY = "nenmong-lang";
-const VALID: readonly LangId[] = ["py", "java", "go", "cpp", "ts"];
+// Derived from the registry, never hand-listed: a hard-coded copy silently
+// dropped "sql" when the sixth track was added, so loadLang() fell back to
+// Python on every reload and the SQL track could not be restored.
+const VALID = new Set<string>(LANGS.map((l) => l.id));
 
 const store = (): Storage | null => {
   if (typeof localStorage === "undefined") return null;
@@ -58,7 +61,7 @@ export async function clearState(lang: LangId): Promise<void> {
 export function loadLang(): LangId {
   try {
     const raw = store()?.getItem(LANG_KEY);
-    return VALID.includes(raw as LangId) ? (raw as LangId) : DEFAULT_LANG;
+    return raw && VALID.has(raw) ? (raw as LangId) : DEFAULT_LANG;
   } catch {
     return DEFAULT_LANG;
   }
