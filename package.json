@@ -11,7 +11,8 @@
     "prebuild": "node scripts/build-search.mjs",
     "budget": "node scripts/check-budget.mjs",
     "check-lockfile": "node scripts/check-lockfile.mjs",
-    "preflight": "npm run check-lockfile && npm run build && npm run budget && npm audit --audit-level=high"
+    "preflight": "npm run check-lockfile && npm run build && npm run budget && npm audit --audit-level=high",
+    "test:nenmong": "node scripts/test-nenmong-engine.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.5",
