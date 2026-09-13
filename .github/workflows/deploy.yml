@@ -3,6 +3,13 @@ name: deploy
 on:
   push:
     branches: [main]
+  # sync.yml commits videos.json with the default GITHUB_TOKEN, and a push made
+  # with that token deliberately does NOT trigger other workflows — so the push
+  # trigger above never fires for a sync. Without this schedule the repo keeps
+  # gaining videos while the published site stays frozen at the last human push.
+  # 30 minutes after sync.yml's 21:00 cron.
+  schedule:
+    - cron: '30 21 * * *'
   workflow_dispatch:
 
 permissions:
