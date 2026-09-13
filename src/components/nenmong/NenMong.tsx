@@ -45,6 +45,28 @@ function loadGrader() {
 type Mode = "gate" | "survey" | "build";
 type Tab = "home" | "map" | "log";
 
+/**
+ * Deep link: /nen-mong/?lang=sql&block=q-l1-select
+ *
+ * Read once at mount. An unknown lang or block is ignored rather than erroring.
+ * Drill ids are unique across the six decks, so ?block= alone can pick its own
+ * track — a block link never lands you on the wrong deck.
+ */
+function readDeepLink(): { lang?: LangId; block?: string } {
+  if (typeof window === "undefined") return {};
+  let q: URLSearchParams;
+  try {
+    q = new URLSearchParams(window.location.search);
+  } catch {
+    return {};
+  }
+  const rawLang = q.get("lang");
+  const block = q.get("block") || undefined;
+  let lang = rawLang && rawLang in LANG_BY_ID ? (rawLang as LangId) : undefined;
+  if (!lang && block) lang = LANGS.find((l) => l.deck.some((d) => d.id === block))?.id;
+  return { lang, block };
+}
+
 /* ---------- seal (井 — giếng) ---------- */
 function Seal({ size = 56, cracked = false, ghost = false }: { size?: number; cracked?: boolean; ghost?: boolean }) {
   return (
@@ -230,7 +252,8 @@ function NodeSquare({ node, selected, onClick, title }: { node: NodeState; selec
 
 /* ============================================================ */
 export default function NenMong() {
-  const [lang, setLang] = useState<LangId>(() => loadLang());
+  const deepLink = useRef(readDeepLink()).current;
+  const [lang, setLang] = useState<LangId>(() => deepLink.lang ?? loadLang());
   /* State is stored WITH the language it belongs to. `lang` changes during
      render while the load is still pending, so a bare AppState would briefly
      be indexed with the new deck's ids and blow up. Pairing them makes the
@@ -307,6 +330,31 @@ export default function NenMong() {
     if (buildOverride && st.nodes[buildOverride] && st.nodes[buildOverride].st === "u") return DECK_BY_ID[buildOverride];
     return unbuilt[0] || null;
   }, [st, unbuilt, buildOverride, DECK_BY_ID]);
+
+  // A ?lang= link chooses the track the same way the selector does, so it sticks.
+  useEffect(() => {
+    if (deepLink.lang) saveLang(deepLink.lang);
+  }, [deepLink.lang]);
+
+  /* Route a ?block= link once the deck's state has loaded. Building is gated:
+     "Xây khối này" only exists while nothing is due, so when a gate is pending
+     — or the block is already built — fall back to the map with the square
+     selected rather than silently doing nothing. */
+  const deepBlockRouted = useRef(false);
+  useEffect(() => {
+    if (deepBlockRouted.current || !deepLink.block || !st) return;
+    deepBlockRouted.current = true;
+    const d = DECK_BY_ID[deepLink.block];
+    if (!d) return;
+    const nd = st.nodes[d.id];
+    if (nd && nd.st === "u" && dueQueue.length === 0) {
+      setBuildOverride(d.id);
+      setTab("home");
+    } else {
+      setSelId(d.id);
+      setTab("map");
+    }
+  }, [st, DECK_BY_ID, dueQueue, deepLink.block]);
 
   // Warm the grader when a grader track is selected, without blocking the UI.
   useEffect(() => {
