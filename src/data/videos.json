@@ -1,5 +1,36 @@
 [
   {
+    "id": "Kw2RCGTI4Cg",
+    "title": "Phỏng vấn Big Tech Mỹ 2026: cấm AI hay bắt dùng AI? #shorts #ethano #interview #softwareengineer",
+    "description": "Năm 2026, phỏng vấn kỹ sư phần mềm ở Big Tech Mỹ đổi luật: có công ty cấm AI, có công ty bắt bạn dùng AI ngay trong phòng phỏng vấn. Google thí điểm vòng code comprehension với Gemini ngồi cạnh. Meta cho chọn model và chấm cả khả năng kiểm chứng. Vòng thuật toán không AI vẫn còn, và ít nhất một vòng gặp trực tiếp đã quay lại.\n\nBộ đủ để có offer (Big Tech, Mỹ, 2026):\n1. Thuật toán và cấu trúc dữ liệu – luyện pattern, không cày đáp án\n2. Đọc code người khác – tìm bug, mở rộng, tối ưu\n3. Dùng AI có kiểm chứng – prompt, soát output, chịu trách nhiệm từng dòng\n4. System design – càng senior càng nặng\n5. Behavioral – kể được vì sao bạn quyết định như vậy\n+1. Mỗi công ty một luật chơi – trinh sát trước khi luyện\n\nTừng món trong danh sách này, Ethano sẽ trang bị dần cho bạn. Cứ ở lại đây.\n\nNếu ngày mai được mang AI vào phỏng vấn, bạn tự tin hơn hay lo hơn? Để lại bình luận.\n\n#BigTech #PhỏngVấn #AI #LeetCode #SystemDesign",
+    "publishedAt": "2026-09-14T11:00:21Z",
+    "durationSec": 85,
+    "tags": [
+      "Ethano",
+      "EthanoPraxis",
+      "binh pháp",
+      "Binh Pháp Kiển Khiêm",
+      "Binh Pháp Nhu Tỉnh",
+      "binh pháp Tôn Tử",
+      "chiến lược",
+      "tư duy chiến lược",
+      "mưu lược",
+      "ra quyết định",
+      "nghệ thuật ra quyết định",
+      "trí tuệ nhân tạo",
+      "thời đại AI",
+      "sự nghiệp thời AI",
+      "học tập",
+      "phát triển bản thân",
+      "triết lý sống",
+      "strategy",
+      "strategic thinking",
+      "decision making",
+      "AI era",
+      "personal growth"
+    ]
+  },
+  {
     "id": "OdwAdwlmqb0",
     "title": "Leetcode - Sliding Window: 3 dấu hiệu nhận ra trong 10 giây (trước khi viết 2 vòng for) #shorts",
     "description": "Quy tắc nhận diện sliding window khi làm LeetCode: 3 dấu hiệu, 1 ví dụ, 1 câu hỏi kiểm tra. \n\nLuyện retrieval tại Nền Móng (https://ethanopraxis.github.io/ethanopraxis/nen-mong/).",
@@ -33,7 +64,7 @@
   {
     "id": "ZPyYafojwhQ",
     "title": "SQL: WHERE và HAVING khác gì nhau? Quy tắc 5 giây (và cái bẫy không báo lỗi) #shorts  #ethano #sql",
-    "description": "WHERE lọc hàng trước khi gộp, HAVING lọc nhóm sau khi gộp. Thứ tự thực thi thật của SQL và một ví dụ sai không báo lỗi. Luyện tập tại \"Nền Móng\" (https://ethanopraxis.github.io/ethanopraxis/nen-mong/)",
+    "description": "WHERE lọc hàng trước khi gộp, HAVING lọc nhóm sau khi gộp. Thứ tự thực thi thật của SQL và một ví dụ sai không báo lỗi. \n\nLuyện tập tại \"Nền Móng\" (https://ethanopraxis.github.io/ethanopraxis/nen-mong/?lang=sql)",
     "publishedAt": "2026-09-13T04:17:07Z",
     "durationSec": 69,
     "tags": [
